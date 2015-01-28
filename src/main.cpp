@@ -148,8 +148,6 @@ void pmotionfunc(int x, int y)
 	}
 	else if (scene.active_camera_valid())
 	{
-		cout << "Is projection matrix invertable? " << invertible(canvas.matrices[canvashdl::projection_matrix]) << endl;
-
 		vec3f direction = norm(canvas.unproject(canvas.to_window(vec2i(x, y))));
 
 		int old_active_object = scene.active_object;
