@@ -43,10 +43,10 @@ struct uniformhdl : materialhdl
 	materialhdl *clone() const;
 };
 
-struct stripeshdl : materialhdl
+struct nonuniformhdl : materialhdl
 {
-	stripeshdl();
-	~stripeshdl();
+	nonuniformhdl();
+	~nonuniformhdl();
 
 	vec3f shade_vertex(canvashdl *canvas, vec3f vertex, vec3f normal, vector<float> &varying) const;
 	vec3f shade_fragment(canvashdl *canvas, vector<float> &varying) const;

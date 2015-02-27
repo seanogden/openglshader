@@ -117,6 +117,7 @@ void objecthdl::draw_bound(canvashdl *canvas)
 		bound_indices.push_back(i);
 		bound_indices.push_back(4+i);
 	}
+	canvas->uniform["material"] = NULL;
 	canvas->draw_lines(bound_geometry, bound_indices);
 	canvas->scale(vec3f(1.0/scale, 1.0/scale, 1.0/scale));
 	canvas->rotate(-orientation[2], vec3f(0.0, 0.0, 1.0));
@@ -180,6 +181,7 @@ void objecthdl::draw_normals(canvashdl *canvas, bool face)
 			}
 		}
 
+		canvas->uniform["material"] = NULL;
 		canvas->draw_lines(normal_geometry, normal_indices);
 		normal_geometry.clear();
 		normal_indices.clear();

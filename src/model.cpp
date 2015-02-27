@@ -86,7 +86,12 @@ void modelhdl::load_obj(string filename)
 			else if (command == "g")
 				rigid.push_back(rigidhdl());
 			else if (command == "usemtl")
+			{
+				if (rigid.size() == 0)
+					rigid.push_back(rigidhdl());
+
 				iss >> rigid.back().material;
+			}
 			else
 			{
 				if (rigid.size() == 0)
@@ -194,13 +199,11 @@ void modelhdl::load_mtl(string filename)
 			if (command == "newmtl")
 			{
 				iss >> type;
+				iss >> current_material;
 				if (type == "uniform")
-				{
-					iss >> current_material;
 					material[current_material] = new uniformhdl();
-				}
-				else if (type == "stripes")
-					material[current_material] = new stripeshdl();
+				else if (type == "non_uniform")
+					material[current_material] = new nonuniformhdl();
 			}
 			else if (command == "Ke" && type == "uniform")
 				iss >> ((uniformhdl*)material[current_material])->emission[0] >> ((uniformhdl*)material[current_material])->emission[1] >> ((uniformhdl*)material[current_material])->emission[2];

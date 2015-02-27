@@ -274,7 +274,7 @@ vec3f canvashdl::shade_vertex(vec8f v, vector<float> &varying)
 vec3f canvashdl::shade_fragment(vector<float> varying)
 {
 	const materialhdl *material;
-	stripeshdl default_material;
+	uniformhdl default_material;
 
 	get_uniform("material", material);
 

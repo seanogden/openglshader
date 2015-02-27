@@ -123,17 +123,17 @@ materialhdl *uniformhdl::clone() const
 	return result;
 }
 
-stripeshdl::stripeshdl()
+nonuniformhdl::nonuniformhdl()
 {
-	type = "stripes";
+	type = "non_uniform";
 }
 
-stripeshdl::~stripeshdl()
+nonuniformhdl::~nonuniformhdl()
 {
 
 }
 
-vec3f stripeshdl::shade_vertex(canvashdl *canvas, vec3f vertex, vec3f normal, vector<float> &varying) const
+vec3f nonuniformhdl::shade_vertex(canvashdl *canvas, vec3f vertex, vec3f normal, vector<float> &varying) const
 {
 	vec4f eye_space_vertex = canvas->matrices[canvashdl::modelview_matrix]*homogenize(vertex);
 	float mult = (float)(fmod(fabs(vertex[1] + 1000.0)*3.0, 1.0) > 0.5);
@@ -176,7 +176,7 @@ vec3f stripeshdl::shade_vertex(canvashdl *canvas, vec3f vertex, vec3f normal, ve
 	return eye_space_vertex;
 }
 
-vec3f stripeshdl::shade_fragment(canvashdl *canvas, vector<float> &varying) const
+vec3f nonuniformhdl::shade_fragment(canvashdl *canvas, vector<float> &varying) const
 {
 	if (canvas->shade_model == canvashdl::flat || canvas->shade_model == canvashdl::gouraud)
 		return vec3f(varying[0], varying[1], varying[2]);
@@ -221,9 +221,9 @@ vec3f stripeshdl::shade_fragment(canvashdl *canvas, vector<float> &varying) cons
 	return vec3f(1.0, 1.0, 1.0);
 }
 
-materialhdl *stripeshdl::clone() const
+materialhdl *nonuniformhdl::clone() const
 {
-	stripeshdl *result = new stripeshdl();
+	nonuniformhdl *result = new nonuniformhdl();
 	result->type = type;
 	return result;
 }
