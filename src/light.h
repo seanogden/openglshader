@@ -14,6 +14,7 @@ using namespace core;
 #define light_h
 
 struct objecthdl;
+struct canvashdl;
 
 struct lighthdl
 {
@@ -29,8 +30,8 @@ struct lighthdl
 	vec3f diffuse;
 	vec3f specular;
 
-	virtual void update(mat4f modelview, mat4f projection) = 0;
-	virtual void shade(vec3f &ambient, vec3f &diffuse, vec3f &specular, mat4f modelview, mat4f projection, vec3f vertex, vec3f normal, float shininess) const = 0;
+	virtual void update(canvashdl *canvas) = 0;
+	virtual void shade(vec3f &ambient, vec3f &diffuse, vec3f &specular, vec3f vertex, vec3f normal, float shininess) const = 0;
 };
 
 struct directionalhdl : lighthdl
@@ -42,8 +43,8 @@ struct directionalhdl : lighthdl
 	// Updated
 	vec3f direction;
 
-	void update(mat4f modelview, mat4f projection);
-	void shade(vec3f &ambient, vec3f &diffuse, vec3f &specular, mat4f modelview, mat4f projection, vec3f vertex, vec3f normal, float shininess) const;
+	void update(canvashdl *canvas);
+	void shade(vec3f &ambient, vec3f &diffuse, vec3f &specular, vec3f vertex, vec3f normal, float shininess) const;
 };
 
 struct pointhdl : lighthdl
@@ -58,8 +59,8 @@ struct pointhdl : lighthdl
 	// Updated
 	vec3f position;
 
-	void update(mat4f modelview, mat4f projection);
-	void shade(vec3f &ambient, vec3f &diffuse, vec3f &specular, mat4f modelview, mat4f projection, vec3f vertex, vec3f normal, float shininess) const;
+	void update(canvashdl *canvas);
+	void shade(vec3f &ambient, vec3f &diffuse, vec3f &specular, vec3f vertex, vec3f normal, float shininess) const;
 };
 
 struct spothdl : lighthdl
@@ -77,8 +78,8 @@ struct spothdl : lighthdl
 	vec3f position;
 	vec3f direction;
 
-	void update(mat4f modelview, mat4f projection);
-	void shade(vec3f &ambient, vec3f &diffuse, vec3f &specular, mat4f modelview, mat4f projection, vec3f vertex, vec3f normal, float shininess) const;
+	void update(canvashdl *canvas);
+	void shade(vec3f &ambient, vec3f &diffuse, vec3f &specular, vec3f vertex, vec3f normal, float shininess) const;
 };
 
 #endif

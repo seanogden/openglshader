@@ -42,7 +42,7 @@ void scenehdl::draw()
 		cameras[active_camera]->view(canvas);
 
 	for (int i = 0; i < lights.size(); i++)
-		lights[i]->update(canvas->matrices[canvashdl::modelview_matrix], canvas->matrices[canvashdl::projection_matrix]);
+		lights[i]->update(canvas);
 
 	for (int i = 0; i < objects.size(); i++)
 		if (objects[i] != NULL)

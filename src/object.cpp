@@ -35,9 +35,27 @@ objecthdl::objecthdl()
 	scale = 1.0;
 }
 
+objecthdl::objecthdl(const objecthdl &o)
+{
+	position = o.position;
+	orientation = o.orientation;
+	bound = o.bound;
+	scale = o.scale;
+	rigid = o.rigid;
+	for (map<string, materialhdl*>::const_iterator i = o.material.begin(); i != o.material.end(); i++)
+		material.insert(pair<string, materialhdl*>(i->first, i->second->clone()));
+}
+
 objecthdl::~objecthdl()
 {
+	for (map<string, materialhdl*>::iterator i = material.begin(); i != material.end(); i++)
+		if (i->second != NULL)
+		{
+			delete i->second;
+			i->second = NULL;
+		}
 
+	material.clear();
 }
 
 /* draw
@@ -55,7 +73,7 @@ void objecthdl::draw(canvashdl *canvas)
 
 	for (int i = 0; i < rigid.size(); i++)
 	{
-		canvas->uniform["material"] = &(material[rigid[i].material]);
+		canvas->uniform["material"] = material[rigid[i].material];
 		rigid[i].draw(canvas);
 	}
 

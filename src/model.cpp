@@ -182,6 +182,7 @@ void modelhdl::load_mtl(string filename)
 	}
 
 	string current_material = "";
+	string type = "";
 	string line(256, '\0');
 	string command;
 	while (getline(fin, line))
@@ -191,17 +192,26 @@ void modelhdl::load_mtl(string filename)
 		if (iss >> command)
 		{
 			if (command == "newmtl")
-				iss >> current_material;
-			else if (command == "Ke")
-				iss >> material[current_material].emission[0] >> material[current_material].emission[1] >> material[current_material].emission[2];
-			else if (command == "Ka")
-				iss >> material[current_material].ambient[0] >> material[current_material].ambient[1] >> material[current_material].ambient[2];
-			else if (command == "Kd")
-				iss >> material[current_material].diffuse[0] >> material[current_material].diffuse[1] >> material[current_material].diffuse[2];
-			else if (command == "Ks")
-				iss >> material[current_material].specular[0] >> material[current_material].specular[1] >> material[current_material].specular[2];
-			else if (command == "Ns")
-				iss >> material[current_material].shininess;
+			{
+				iss >> type;
+				if (type == "uniform")
+				{
+					iss >> current_material;
+					material[current_material] = new uniformhdl();
+				}
+				else if (type == "stripes")
+					material[current_material] = new stripeshdl();
+			}
+			else if (command == "Ke" && type == "uniform")
+				iss >> ((uniformhdl*)material[current_material])->emission[0] >> ((uniformhdl*)material[current_material])->emission[1] >> ((uniformhdl*)material[current_material])->emission[2];
+			else if (command == "Ka" && type == "uniform")
+				iss >> ((uniformhdl*)material[current_material])->ambient[0] >> ((uniformhdl*)material[current_material])->ambient[1] >> ((uniformhdl*)material[current_material])->ambient[2];
+			else if (command == "Kd" && type == "uniform")
+				iss >> ((uniformhdl*)material[current_material])->diffuse[0] >> ((uniformhdl*)material[current_material])->diffuse[1] >> ((uniformhdl*)material[current_material])->diffuse[2];
+			else if (command == "Ks" && type == "uniform")
+				iss >> ((uniformhdl*)material[current_material])->specular[0] >> ((uniformhdl*)material[current_material])->specular[1] >> ((uniformhdl*)material[current_material])->specular[2];
+			else if (command == "Ns" && type == "uniform")
+				iss >> ((uniformhdl*)material[current_material])->shininess;
 		}
 	}
 }

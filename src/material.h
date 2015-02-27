@@ -6,16 +6,31 @@
  */
 
 #include "core/geometry.h"
+#include "standard.h"
 
 using namespace core;
 
 #ifndef material_h
 #define material_h
 
+struct canvashdl;
+
 struct materialhdl
 {
 	materialhdl();
-	~materialhdl();
+	virtual ~materialhdl();
+
+	string type;
+
+	virtual vec3f shade_vertex(canvashdl *canvas, vec3f vertex, vec3f normal, vector<float> &varying) const = 0;
+	virtual vec3f shade_fragment(canvashdl *canvas, vector<float> &varying) const = 0;
+	virtual materialhdl *clone() const = 0;
+};
+
+struct uniformhdl : materialhdl
+{
+	uniformhdl();
+	~uniformhdl();
 
 	vec3f emission;
 	vec3f ambient;
@@ -23,7 +38,19 @@ struct materialhdl
 	vec3f specular;
 	float shininess;
 
-	vec3f color(vec3f light_ambient, vec3f light_diffuse, vec3f light_specular) const;
+	vec3f shade_vertex(canvashdl *canvas, vec3f vertex, vec3f normal, vector<float> &varying) const;
+	vec3f shade_fragment(canvashdl *canvas, vector<float> &varying) const;
+	materialhdl *clone() const;
+};
+
+struct stripeshdl : materialhdl
+{
+	stripeshdl();
+	~stripeshdl();
+
+	vec3f shade_vertex(canvashdl *canvas, vec3f vertex, vec3f normal, vector<float> &varying) const;
+	vec3f shade_fragment(canvashdl *canvas, vector<float> &varying) const;
+	materialhdl *clone() const;
 };
 
 #endif

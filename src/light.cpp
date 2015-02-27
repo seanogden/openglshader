@@ -7,6 +7,7 @@
 
 #include "light.h"
 #include "object.h"
+#include "canvas.h"
 
 lighthdl::lighthdl()
 {
@@ -43,30 +44,42 @@ directionalhdl::~directionalhdl()
 
 }
 
-void directionalhdl::update(mat4f modelview, mat4f projection)
+void directionalhdl::update(canvashdl *canvas)
 {
-	if (model != NULL)
-		direction = rol3(vec3f(0.0, 0.0, 1.0), model->orientation);
+	if (canvas != NULL && model != NULL)
+	{
+		canvas->translate(model->position);
+		canvas->rotate(model->orientation[0], vec3f(1.0, 0.0, 0.0));
+		canvas->rotate(model->orientation[1], vec3f(0.0, 1.0, 0.0));
+		canvas->rotate(model->orientation[2], vec3f(0.0, 0.0, 1.0));
+
+		canvas->update_normal_matrix();
+		direction = canvas->matrices[canvashdl::normal_matrix]*vec4f(0.0, 0.0, -1.0, 0.0);
+
+		canvas->rotate(-model->orientation[2], vec3f(0.0, 0.0, 1.0));
+		canvas->rotate(-model->orientation[1], vec3f(0.0, 1.0, 0.0));
+		canvas->rotate(-model->orientation[0], vec3f(1.0, 0.0, 0.0));
+		canvas->translate(-model->position);
+	}
 }
 
-void directionalhdl::shade(vec3f &ambient, vec3f &diffuse, vec3f &specular, mat4f modelview, mat4f projection, vec3f vertex, vec3f normal, float shininess) const
+void directionalhdl::shade(vec3f &ambient, vec3f &diffuse, vec3f &specular, vec3f vertex, vec3f normal, float shininess) const
 {
-	vec3f eye = modelview.col(3)(0,3);
+	vec3f eye_direction = -vertex;
+	float eye_distance = mag(eye_direction);
+	eye_direction /= eye_distance;
 
-	vec3f ndirection = norm(direction);
-	vec3f half_vector = norm(ndirection + norm(-vertex));
+	vec3f half_vector = norm(direction + eye_direction);
 
-	float ndotdir = max(0.0f, dot(normal, ndirection));
-	float ndothv = max(0.0f, dot(normal, half_vector));
+	float normal_dot_light_direction = max(0.0f, dot(normal, direction));
+	float normal_dot_half_vector = max(0.0f, dot(normal, half_vector));
 
-	float power_factor;
-	if (ndotdir == 0.0)
-		power_factor = 0.0;
-	else
-		power_factor = pow(ndothv, shininess);
+	float power_factor = 0.0;
+	if (normal_dot_light_direction > 0.0)
+		power_factor = pow(normal_dot_half_vector, shininess);
 
 	ambient += this->ambient;
-	diffuse += this->diffuse*ndotdir;
+	diffuse += this->diffuse*normal_dot_light_direction;
 	specular += this->specular*power_factor;
 }
 
@@ -87,36 +100,48 @@ pointhdl::~pointhdl()
 
 }
 
-void pointhdl::update(mat4f modelview, mat4f projection)
+void pointhdl::update(canvashdl *canvas)
 {
-	if (model != NULL)
+	if (canvas != NULL && model != NULL)
 	{
-		vec4f p = projection*modelview*homogenize(model->position);
-		position = p/p[3];
+		canvas->translate(model->position);
+		canvas->rotate(model->orientation[0], vec3f(1.0, 0.0, 0.0));
+		canvas->rotate(model->orientation[1], vec3f(0.0, 1.0, 0.0));
+		canvas->rotate(model->orientation[2], vec3f(0.0, 0.0, 1.0));
+
+		vec4f p = canvas->matrices[canvashdl::modelview_matrix]*vec4f(0.0, 0.0, 0.0, 1.0);
+		position = p(0,3)/p[3];
+
+		canvas->rotate(-model->orientation[2], vec3f(0.0, 0.0, 1.0));
+		canvas->rotate(-model->orientation[1], vec3f(0.0, 1.0, 0.0));
+		canvas->rotate(-model->orientation[0], vec3f(1.0, 0.0, 0.0));
+		canvas->translate(-model->position);
 	}
 }
 
-void pointhdl::shade(vec3f &ambient, vec3f &diffuse, vec3f &specular, mat4f modelview, mat4f projection, vec3f vertex, vec3f normal, float shininess) const
+void pointhdl::shade(vec3f &ambient, vec3f &diffuse, vec3f &specular, vec3f vertex, vec3f normal, float shininess) const
 {
-	vec3f eye = modelview.col(3)(0,3);
+	vec3f light_direction = position - vertex;
+	float light_distance = mag(light_direction);
+	light_direction /= light_distance;
 
-	vec3f vp = position - vertex;
-	float d = mag(vp);
-	vp /= d;
+	vec3f eye_direction = -vertex;
+	float eye_distance = mag(eye_direction);
+	eye_direction /= eye_distance;
 
-	float att = 1.0/(attenuation[0] + attenuation[1]*d + attenuation[2]*d*d);
+	float att = 1.0/(attenuation[0] + attenuation[1]*light_distance + attenuation[2]*light_distance*light_distance);
 
-	vec3f half_vector = norm(vp + norm(-vertex));
+	vec3f half_vector = norm(light_direction + eye_direction);
 
-	float ndotvp = max(0.0f, dot(normal, vp));
-	float ndothv = max(0.0f, dot(normal, half_vector));
+	float normal_dot_light_direction = max(0.0f, dot(normal, light_direction));
+	float normal_dot_half_vector = max(0.0f, dot(normal, half_vector));
 
 	float power_factor = 0.0;
-	if (ndotvp != 0.0)
-		power_factor = pow(ndothv, shininess);
+	if (normal_dot_light_direction > 0.0)
+		power_factor = pow(normal_dot_half_vector, shininess);
 
 	ambient += this->ambient*att;
-	diffuse += this->diffuse*ndotvp*att;
+	diffuse += this->diffuse*normal_dot_light_direction*att;
 	specular += this->specular*power_factor*att;
 }
 
@@ -141,26 +166,39 @@ spothdl::~spothdl()
 
 }
 
-void spothdl::update(mat4f modelview, mat4f projection)
+void spothdl::update(canvashdl *canvas)
 {
-	if (model != NULL)
+	if (canvas != NULL && model != NULL)
 	{
-		direction = rol3(vec3f(0.0, 0.0, 1.0), -model->orientation);
-		vec4f p = projection*modelview*homogenize(model->position);
-		position = p/p[3];
+		canvas->translate(model->position);
+		canvas->rotate(model->orientation[0], vec3f(1.0, 0.0, 0.0));
+		canvas->rotate(model->orientation[1], vec3f(0.0, 1.0, 0.0));
+		canvas->rotate(model->orientation[2], vec3f(0.0, 0.0, 1.0));
+
+		vec4f p = canvas->matrices[canvashdl::modelview_matrix]*vec4f(0.0, 0.0, 0.0, 1.0);
+		position = p(0,3)/p[3];
+		canvas->update_normal_matrix();
+		direction = canvas->matrices[canvashdl::normal_matrix]*vec4f(0.0, 0.0, -1.0, 0.0);
+
+		canvas->rotate(-model->orientation[2], vec3f(0.0, 0.0, 1.0));
+		canvas->rotate(-model->orientation[1], vec3f(0.0, 1.0, 0.0));
+		canvas->rotate(-model->orientation[0], vec3f(1.0, 0.0, 0.0));
+		canvas->translate(-model->position);
 	}
 }
 
-void spothdl::shade(vec3f &ambient, vec3f &diffuse, vec3f &specular, mat4f modelview, mat4f projection, vec3f vertex, vec3f normal, float shininess) const
+void spothdl::shade(vec3f &ambient, vec3f &diffuse, vec3f &specular, vec3f vertex, vec3f normal, float shininess) const
 {
-	vec3f eye = modelview.col(3)(0,3);
+	vec3f light_direction = position - vertex;
+	float light_distance = mag(light_direction);
+	light_direction /= light_distance;
 
-	vec3f vp = position - vertex;
-	float d = mag(vp);
-	vp /= d;
+	vec3f eye_direction = -vertex;
+	float eye_distance = mag(eye_direction);
+	eye_direction /= eye_distance;
 
-	float att = 1.0/(attenuation[0] + attenuation[1]*d + attenuation[2]*d*d);
-	float spotdot = dot(-vp, direction);
+	float att = 1.0/(attenuation[0] + attenuation[1]*light_distance + attenuation[2]*light_distance*light_distance);
+	float spotdot = dot(-light_direction, direction);
 
 	float spotatt = 0.0;
 	if (spotdot >= cutoff)
@@ -168,15 +206,15 @@ void spothdl::shade(vec3f &ambient, vec3f &diffuse, vec3f &specular, mat4f model
 
 	att *= spotatt;
 
-	vec3f half_vector = norm(vp + norm(-vertex));
-	float ndotvp = max(0.0f, dot(normal, vp));
-	float ndothv = max(0.0f, dot(normal, half_vector));
+	vec3f half_vector = norm(light_direction + norm(-vertex));
+	float normal_dot_light_direction = max(0.0f, dot(normal, light_direction));
+	float normal_dot_half_vector = max(0.0f, dot(normal, half_vector));
 
 	float power_factor = 0.0;
-	if (ndotvp > 0)
-		power_factor = pow(ndothv, shininess);
+	if (normal_dot_light_direction > 0.0)
+		power_factor = pow(normal_dot_half_vector, shininess);
 
 	ambient += this->ambient*att;
-	diffuse += this->diffuse*ndotvp*att;
+	diffuse += this->diffuse*normal_dot_light_direction*att;
 	specular += this->specular*power_factor*att;
 }
