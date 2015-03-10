@@ -64,8 +64,12 @@ vec3f uniformhdl::shade_vertex(canvashdl *canvas, vec3f vertex, vec3f normal, ve
 		varying.push_back(color[2]);
 	}
 	else if (canvas->shade_model == canvashdl::phong)
-		for (int i = 0; i < 6; i++)
+    {
+		for (int i = 0; i < 3; i++)
 			varying.push_back(vertex[i]);
+        for (int i = 0; i < 3; i++)
+            varying.push_back(normal[i]);
+    }
 
 	eye_space_vertex = canvas->matrices[canvashdl::projection_matrix]*eye_space_vertex;
 	eye_space_vertex /= eye_space_vertex[3];
@@ -100,8 +104,8 @@ vec3f uniformhdl::shade_fragment(canvashdl *canvas, vector<float> &varying) cons
 			eye_coord_normal /= sqrt(m);
 			for (int j = 0; j < lights->size(); j++)
 				if (lights->at(j) != NULL)
-					lights->at(j)->shade(light_ambient, light_diffuse, light_specular, eye_coord_vertex, eye_coord_normal, shininess);
-
+                    lights->at(j)->shade(light_ambient, light_diffuse, light_specular, eye_coord_vertex, eye_coord_normal, shininess);
+            
 			return clamp(emission + ambient*light_ambient + diffuse*light_diffuse + specular*light_specular, 0.0f, 1.0f);
 		}
 	}

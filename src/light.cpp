@@ -139,7 +139,7 @@ void pointhdl::shade(vec3f &ambient, vec3f &diffuse, vec3f &specular, vec3f vert
 	float power_factor = 0.0;
 	if (normal_dot_light_direction > 0.0)
 		power_factor = pow(normal_dot_half_vector, shininess);
-
+    
 	ambient += this->ambient*att;
 	diffuse += this->diffuse*normal_dot_light_direction*att;
 	specular += this->specular*power_factor*att;
