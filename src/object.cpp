@@ -1,5 +1,4 @@
 #include "object.h"
-#include "canvas.h"
 
 rigidhdl::rigidhdl()
 {
@@ -15,7 +14,7 @@ rigidhdl::~rigidhdl()
  *
  * Draw a rigid body.
  */
-void rigidhdl::draw(canvashdl *canvas)
+void rigidhdl::draw()
 {
 	// TODO Assignment 1: Send the rigid body geometry to the renderer
 }
@@ -56,7 +55,7 @@ objecthdl::~objecthdl()
  * Draw the model. Don't forget to apply the transformations necessary
  * for position, orientation, and scale.
  */
-void objecthdl::draw(canvashdl *canvas)
+void objecthdl::draw(const vector<lighthdl*> &lights)
 {
 	// TODO Assignment 1: Send transformations and geometry to the renderer to draw the object
 	// TODO Assignment 2: Pass the material as a uniform into the renderer
@@ -67,7 +66,7 @@ void objecthdl::draw(canvashdl *canvas)
  * Create a representation for the bounding box and
  * render it.
  */
-void objecthdl::draw_bound(canvashdl *canvas)
+void objecthdl::draw_bound()
 {
 	/* TODO Assignment 1: Generate the geometry for the bounding box and send the necessary
 	 * transformations and geometry to the renderer
@@ -81,7 +80,7 @@ void objecthdl::draw_bound(canvashdl *canvas)
  * If face is false, render the vertex normals. Otherwise,
  * calculate the normals for each face and render those.
  */
-void objecthdl::draw_normals(canvashdl *canvas, bool face)
+void objecthdl::draw_normals(bool face)
 {
 	/* TODO Assignment 1: Generate the geometry to display the normals and send the necessary
 	 * transformations and geometry to the renderer

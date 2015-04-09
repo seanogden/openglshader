@@ -16,7 +16,7 @@ camerahdl::~camerahdl()
 
 }
 
-void camerahdl::view(canvashdl *canvas)
+void camerahdl::view()
 {
 	/* TODO Assignment 1: Do the necessary modelview transformations to move
 	 * the camera into place.
@@ -38,7 +38,7 @@ orthohdl::~orthohdl()
 {
 }
 
-void orthohdl::project(canvashdl *canvas)
+void orthohdl::project()
 {
 	// TODO Assignment 1: Use the canvashdl::ortho function to set up an orthographic projection
 }
@@ -59,7 +59,7 @@ frustumhdl::~frustumhdl()
 
 }
 
-void frustumhdl::project(canvashdl *canvas)
+void frustumhdl::project()
 {
 	// TODO Assignment 1: Use the canvashdl::frustum function to set up a perspective projection
 }
@@ -78,7 +78,7 @@ perspectivehdl::~perspectivehdl()
 
 }
 
-void perspectivehdl::project(canvashdl *canvas)
+void perspectivehdl::project()
 {
 	// TODO Assignment 1: Use the canvashdl::perspective function to set up a perspective projection
 }

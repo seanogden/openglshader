@@ -1,6 +1,5 @@
 #include "opengl.h"
 #include "standard.h"
-#include "canvas.h"
 #include "scene.h"
 #include "camera.h"
 #include "model.h"
@@ -10,12 +9,16 @@
 
 int window_id;
 
-canvashdl canvas(750, 750);
 scenehdl scene;
 
 int mousex = 0, mousey = 0;
 bool bound = false;
 bool menu = false;
+
+int width = 750;
+int height = 750;
+
+string working_directory = "";
 
 namespace manipulate
 {
@@ -38,29 +41,28 @@ manipulate::type manipulator;
 
 bool keys[256];
 
-void init(string working_directory)
+void init()
 {
 	for (int i = 0; i < 256; i++)
 		keys[i] = false;
 
-	canvas.working_directory = working_directory;
-	scene.canvas = &canvas;
 	// TODO Assignment 1: Initialize the Scene as necessary.
 }
 
 void displayfunc()
 {
-	canvas.clear_color_buffer();
-	canvas.clear_depth_buffer();
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	scene.draw();
 
-	canvas.swap_buffers();
+	glutSwapBuffers();
 }
 
 void reshapefunc(int w, int h)
 {
-	canvas.viewport(0, 0, w, h);
+	glViewport(0, 0, w, h);
+	width = w;
+	height = h;
 	glutPostRedisplay();
 }
 
@@ -75,15 +77,15 @@ void pmotionfunc(int x, int y)
 		mousey = y;
 
 		bool warp = false;
-		if (mousex > 3*canvas.get_width()/4 || mousex < canvas.get_width()/4)
+		if (mousex > 3*width/4 || mousex < width/4)
 		{
-			mousex = canvas.get_width()/2;
+			mousex = width/2;
 			warp = true;
 		}
 
-		if (mousey > 3*canvas.get_height()/4 || mousey < canvas.get_height()/4)
+		if (mousey > 3*height/4 || mousey < height/4)
 		{
-			mousey = canvas.get_height()/2;
+			mousey = height/2;
 			warp = true;
 		}
 
@@ -222,7 +224,7 @@ int main(int argc, char **argv)
 #endif
 	glutInitDisplayMode(display_mode);
 
-	glutInitWindowSize(750, 750);
+	glutInitWindowSize(width, height);
 	glutInitWindowPosition(0, 0);
 	window_id = glutCreateWindow("Assignment");
 
@@ -239,8 +241,9 @@ int main(int argc, char **argv)
 	cout << "Status: Using OpenGL " << glGetString(GL_VERSION) << endl;
 	cout << "Status: Using GLSL " << glGetString(GL_SHADING_LANGUAGE_VERSION) << endl;
 
+	working_directory = string(argv[0]).substr(0, string(argv[0]).find_last_of("/\\")) + "/";
 
-	init(string(argv[0]).substr(0, string(argv[0]).find_last_of("/\\")) + "/");
+	init();
 	create_menu();
 
 	glutReshapeFunc(reshapefunc);
