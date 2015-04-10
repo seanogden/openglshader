@@ -1,5 +1,6 @@
 #include "material.h"
 #include "light.h"
+#include "lodepng.h"
 
 GLuint whitehdl::vertex = 0;
 GLuint whitehdl::fragment = 0;
@@ -12,6 +13,11 @@ GLuint solidhdl::program = 0;
 GLuint brickhdl::vertex = 0;
 GLuint brickhdl::fragment = 0;
 GLuint brickhdl::program = 0;
+
+GLuint texturehdl::vertex = 0;
+GLuint texturehdl::fragment = 0;
+GLuint texturehdl::program = 0;
+GLuint texturehdl::texture = 0;
 
 extern string working_directory;
 
@@ -124,5 +130,39 @@ materialhdl *brickhdl::clone() const
 {
 	brickhdl *result = new brickhdl();
 	result->type = type;
+	return result;
+}
+
+texturehdl::texturehdl()
+{
+	type = "texture";
+
+	shininess = 1.0;
+
+	if (vertex == 0 && fragment == 0 && program == 0)
+	{
+		/* TODO Assignment 3: Load and link the shaders and load the texture Keep in mind that vertex, fragment,
+		 * and program are static variables meaning they are *shared across all instances of
+		 * this class. So you only have to initialize them once when the first instance of
+		 * the class is created.
+		 */
+	}
+}
+
+texturehdl::~texturehdl()
+{
+
+}
+
+void texturehdl::apply(const vector<lighthdl*> &lights)
+{
+	// TODO Assignment 3: Apply the shader program and pass it the necessary uniform values
+}
+
+materialhdl *texturehdl::clone() const
+{
+	texturehdl *result = new texturehdl();
+	result->type = type;
+	result->shininess = shininess;
 	return result;
 }
