@@ -6,9 +6,9 @@ GLuint whitehdl::vertex = 0;
 GLuint whitehdl::fragment = 0;
 GLuint whitehdl::program = 0;
 
-GLuint solidhdl::vertex = 0;
-GLuint solidhdl::fragment = 0;
-GLuint solidhdl::program = 0;
+GLuint gouraudhdl::vertex = 0;
+GLuint gouraudhdl::fragment = 0;
+GLuint gouraudhdl::program = 0;
 
 GLuint brickhdl::vertex = 0;
 GLuint brickhdl::fragment = 0;
@@ -30,9 +30,9 @@ materialhdl::~materialhdl()
 {
 }
 
-solidhdl::solidhdl()
+gouraudhdl::gouraudhdl()
 {
-	type = "solid";
+	type = "gouraud";
 	emission = vec3f(0.0, 0.0, 0.0);
 	ambient = vec3f(0.1, 0.1, 0.1);
 	diffuse = vec3f(1.0, 1.0, 1.0);
@@ -49,19 +49,60 @@ solidhdl::solidhdl()
 	}
 }
 
-solidhdl::~solidhdl()
+gouraudhdl::~gouraudhdl()
 {
 
 }
 
-void solidhdl::apply(const vector<lighthdl*> &lights)
+void gouraudhdl::apply(const vector<lighthdl*> &lights)
 {
 	// TODO Assignment 3: Apply the shader program and pass it the necessary uniform values
 }
 
-materialhdl *solidhdl::clone() const
+materialhdl *gouraudhdl::clone() const
 {
-	solidhdl *result = new solidhdl();
+	gouraudhdl *result = new gouraudhdl();
+	result->type = type;
+	result->emission = emission;
+	result->ambient = ambient;
+	result->diffuse = diffuse;
+	result->specular = specular;
+	result->shininess = shininess;
+	return result;
+}
+
+phonghdl::phonghdl()
+{
+	type = "phong";
+	emission = vec3f(0.0, 0.0, 0.0);
+	ambient = vec3f(0.1, 0.1, 0.1);
+	diffuse = vec3f(1.0, 1.0, 1.0);
+	specular = vec3f(1.0, 1.0, 1.0);
+	shininess = 1.0;
+
+	if (vertex == 0 && fragment == 0 && program == 0)
+	{
+		/* TODO Assignment 3: Load and link the shaders. Keep in mind that vertex, fragment, 
+		 * and program are static variables meaning they are *shared across all instances of
+		 * this class. So you only have to initialize them once when the first instance of
+		 * the class is created.
+		 */
+	}
+}
+
+phonghdl::~phonghdl()
+{
+
+}
+
+void phonghdl::apply(const vector<lighthdl*> &lights)
+{
+	// TODO Assignment 3: Apply the shader program and pass it the necessary uniform values
+}
+
+materialhdl *phonghdl::clone() const
+{
+	phonghdl *result = new phonghdl();
 	result->type = type;
 	result->emission = emission;
 	result->ambient = ambient;
