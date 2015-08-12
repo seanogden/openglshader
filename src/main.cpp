@@ -1,24 +1,8 @@
 /*
  * main.cpp
- * Blaze Game Engine v0.11
  *
- * Created by Ned Bingham on October 20, 2011.
- * Modified by Ned Bingham on October 20, 2011.
- * Copyright 2011 Sol Union. All rights reserved.
- *
- * Blaze Game Engine v0.11 is free software: you can redistribute
- * it and/or modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation, either version 3 of the License,
- * or (at your option) any later version.
- *
- * Blaze Game Engine v0.11 is distributed in the hope that it will
- * be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Blaze Game Engine v0.11.
- * If not, see <http://www.gnu.org/licenses/>.
+ *  Created on: Dec 2, 2014
+ *      Author: nbingham 
  */
 
 #include "opengl.h"
@@ -466,7 +450,6 @@ void canvas_menu(int num)
 	{
 		scene.lights.push_back(new directionalhdl());
 		scene.objects.push_back(new cylinderhdl(0.25, 1.0, 8));
-		((uniformhdl*)scene.objects.back()->material["default"])->emission = vec3f(1.0, 1.0, 1.0);
 		for (int k = 0; k < scene.objects.back()->rigid.size(); k++)
 			for (int i = 0; i < scene.objects.back()->rigid[k].geometry.size(); i++)
 			{
@@ -483,14 +466,12 @@ void canvas_menu(int num)
 	{
 		scene.lights.push_back(new pointhdl());
 		scene.objects.push_back(new spherehdl(0.25, 4, 8));
-		((uniformhdl*)scene.objects.back()->material["default"])->emission = vec3f(1.0, 1.0, 1.0);
 		scene.lights.back()->model = scene.objects.back();
 	}
 	else if (num == 9)
 	{
 		scene.lights.push_back(new spothdl());
 		scene.objects.push_back(new pyramidhdl(0.25, 1.0, 8));
-		((uniformhdl*)scene.objects.back()->material["default"])->emission = vec3f(1.0, 1.0, 1.0);
 		for (int k = 0; k < scene.objects.back()->rigid.size(); k++)
 			for (int i = 0; i < scene.objects.back()->rigid[k].geometry.size(); i++)
 			{
@@ -591,14 +572,10 @@ void canvas_menu(int num)
 		canvas.polygon_mode = canvashdl::line;
 	else if (num == 23)
 		canvas.polygon_mode = canvashdl::fill;
-	else if (num == 24)
-		canvas.shade_model = canvashdl::none;
 	else if (num == 25)
 		canvas.shade_model = canvashdl::flat;
 	else if (num == 26)
-		canvas.shade_model = canvashdl::gouraud;
-	else if (num == 27)
-		canvas.shade_model = canvashdl::phong;
+		canvas.shade_model = canvashdl::smooth;
 	else if (num == 28)
 		canvas.culling = canvashdl::disable;
 	else if (num == 29)
@@ -672,6 +649,57 @@ void object_menu(int num)
 	{
 		scene.cameras[scene.active_camera]->focus = scene.objects[scene.active_object];
 		scene.cameras[scene.active_camera]->radius = dist(scene.objects[scene.active_object]->position, scene.cameras[scene.active_camera]->position);
+	}
+	// TODO Assignment 4: uncomment this
+	/*else if (num == 6 && scene.active_object_valid())
+	{
+		for (map<string, materialhdl*>::iterator i = scene.objects[scene.active_object]->material.begin(); i != scene.objects[scene.active_object]->material.end(); i++)
+		{
+			if (i->second != NULL)
+				delete i->second;
+			i->second = new texturehdl();
+		}
+		glutPostRedisplay();
+	}*/
+	else if (num == 7 && scene.active_object_valid())
+	{
+		for (map<string, materialhdl*>::iterator i = scene.objects[scene.active_object]->material.begin(); i != scene.objects[scene.active_object]->material.end(); i++)
+		{
+			if (i->second != NULL)
+				delete i->second;
+			i->second = new customhdl();
+		}
+		glutPostRedisplay();
+	}
+	else if (num == 8 && scene.active_object_valid())
+	{
+		for (map<string, materialhdl*>::iterator i = scene.objects[scene.active_object]->material.begin(); i != scene.objects[scene.active_object]->material.end(); i++)
+		{
+			if (i->second != NULL)
+				delete i->second;
+			i->second = new phonghdl();
+		}
+		glutPostRedisplay();
+	}
+	else if (num == 9 && scene.active_object_valid())
+	{
+		for (map<string, materialhdl*>::iterator i = scene.objects[scene.active_object]->material.begin(); i != scene.objects[scene.active_object]->material.end(); i++)
+		{
+			if (i->second != NULL)
+				delete i->second;
+			i->second = new gouraudhdl();
+		}
+		glutPostRedisplay();
+	}
+	else if (num == 10 && scene.active_object_valid())
+	{
+		for (map<string, materialhdl*>::iterator i = scene.objects[scene.active_object]->material.begin(); i != scene.objects[scene.active_object]->material.end(); i++)
+		{
+			if (i->second != NULL)
+				delete i->second;
+			i->second = new whitehdl();
+		}
+		glutPostRedisplay();
 	}
 
 }
@@ -846,10 +874,8 @@ void create_menu()
 
 
 	int shading_id = glutCreateMenu(canvas_menu);
-	glutAddMenuEntry(" None        ", 24);
 	glutAddMenuEntry(" Flat        ", 25);
-	glutAddMenuEntry(" Gouraud     ", 26);
-	glutAddMenuEntry(" Phong       ", 27);
+	glutAddMenuEntry(" Smooth      ", 26);
 
 	int culling_id = glutCreateMenu(canvas_menu);
 	glutAddMenuEntry(" None        ", 28);
@@ -871,8 +897,16 @@ void create_menu()
     glutAddSubMenu  (" Normals     ", normal_id);
     glutAddMenuEntry(" Quit        ", 0);
 
+    int material_menu_id = glutCreateMenu(object_menu);
+    glutAddMenuEntry(" White       ", 10);
+    glutAddMenuEntry(" Gouraud     ", 9);
+    glutAddMenuEntry(" Phong       ", 8);
+    glutAddMenuEntry(" Custom      ", 7);
+    // TODO Assignment 4: uncomment this
+	//glutAddMenuEntry(" Texture     ", 6);
 
     object_menu_id = glutCreateMenu(object_menu);
+    glutAddSubMenu  (" Material    ", material_menu_id);
     glutAddMenuEntry(" Set Focus   ", 5);
     glutAddMenuEntry(" Translate   ", 1);
     glutAddMenuEntry(" Rotate      ", 2);

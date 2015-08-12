@@ -38,7 +38,7 @@ canvashdl::canvashdl(int w, int h)
 		matrices[i] = identity<float, 4, 4>();
 
 	polygon_mode = fill;
-	shade_model = none;
+	shade_model = smooth;
 	culling = backface;
 }
 
@@ -109,6 +109,7 @@ void canvashdl::set_matrix(matrix_id matid)
 /* load_identity
  *
  * Set the active matrix to the identity matrix.
+ * This implements: https://www.opengl.org/sdk/docs/man2/xhtml/glLoadIdentity.xml
  */
 void canvashdl::load_identity()
 {
@@ -118,6 +119,7 @@ void canvashdl::load_identity()
 /* rotate
  *
  * Multiply the active matrix by a rotation matrix.
+ * This implements: https://www.opengl.org/sdk/docs/man2/xhtml/glRotate.xml
  */
 void canvashdl::rotate(float angle, vec3f axis)
 {
@@ -138,6 +140,7 @@ void canvashdl::rotate(float angle, vec3f axis)
 /* translate
  *
  * Multiply the active matrix by a translation matrix.
+ * This implements: https://www.opengl.org/sdk/docs/man2/xhtml/glTranslate.xml
  */
 void canvashdl::translate(vec3f direction)
 {
@@ -150,6 +153,7 @@ void canvashdl::translate(vec3f direction)
 /* scale
  *
  * Multiply the active matrix by a scaling matrix.
+ * This implements: https://www.opengl.org/sdk/docs/man2/xhtml/glScale.xml
  */
 void canvashdl::scale(vec3f size)
 {
@@ -162,6 +166,7 @@ void canvashdl::scale(vec3f size)
 /* perspective
  *
  * Multiply the active matrix by a perspective projection matrix.
+ * This implements: https://www.opengl.org/sdk/docs/man2/xhtml/gluPerspective.xml
  */
 void canvashdl::perspective(float fovy, float aspect, float n, float f)
 {
@@ -175,6 +180,7 @@ void canvashdl::perspective(float fovy, float aspect, float n, float f)
 /* frustum
  *
  * Multiply the active matrix by a frustum projection matrix.
+ * This implements: https://www.opengl.org/sdk/docs/man2/xhtml/glFrustum.xml
  */
 void canvashdl::frustum(float l, float r, float b, float t, float n, float f)
 {
@@ -187,6 +193,7 @@ void canvashdl::frustum(float l, float r, float b, float t, float n, float f)
 /* ortho
  *
  * Multiply the active matrix by an orthographic projection matrix.
+ * This implements: https://www.opengl.org/sdk/docs/man2/xhtml/glOrtho.xml
  */
 void canvashdl::ortho(float l, float r, float b, float t, float n, float f)
 {
@@ -206,6 +213,12 @@ void canvashdl::viewport(int left, int bottom, int right, int top)
 	resize(right - left, top - bottom);
 }
 
+/* look_at
+ *
+ * Move and orient the modelview so the camera is at the 'at' position focused on the 'eye'
+ * position and rotated so the 'up' vector is up
+ * This implements: https://www.opengl.org/sdk/docs/man2/xhtml/gluLookAt.xml
+ */
 void canvashdl::look_at(vec3f eye, vec3f at, vec3f up)
 {
 	vec3f f = norm(at - eye);
@@ -241,6 +254,7 @@ vec3f canvashdl::to_window(vec2i pixel)
 /* unproject
  *
  * Unproject a window coordinate into world coordinates.
+ * This implements: https://www.opengl.org/sdk/docs/man2/xhtml/gluUnProject.xml
  */
 vec3f canvashdl::unproject(vec3f window)
 {
@@ -249,14 +263,19 @@ vec3f canvashdl::unproject(vec3f window)
 
 /* shade_vertex
  *
- * This is the vertex shader. All transformations (normal, projection, modelview, etc)
- * should happen here. Flat and Gouraud shading, those are done here as
- * well.
+ * This is the vertex shader.
+ * v[0] to v[2] is position
+ * v[3] to v[5] is normal
+ * v[7] to v[8] is texture coordinates
+ * The result from this function is interpolated and passed on to the fragment shader
+ * (its also used to draw the geometry during rasterization)
+ * Note that the only requirements for the returned values are that the first 3 components
+ * be a projected position. The rest are yours to decide what to do with.
  */
 vec3f canvashdl::shade_vertex(vec8f v, vector<float> &varying)
 {
 	const materialhdl *material;
-	uniformhdl default_material;
+	whitehdl default_material;
 
 	get_uniform("material", material);
 
@@ -268,13 +287,13 @@ vec3f canvashdl::shade_vertex(vec8f v, vector<float> &varying)
 
 /* shade_fragment
  *
- * This is the fragment shader. The pixel color is determined here. Phong shading is also
- * done here.
+ * This is the fragment shader. The pixel color is determined here.
+ * the values for v are the interpolated result of whatever you returned from the vertex shader
  */
 vec3f canvashdl::shade_fragment(vector<float> varying)
 {
 	const materialhdl *material;
-	uniformhdl default_material;
+	whitehdl default_material;
 
 	get_uniform("material", material);
 
@@ -545,9 +564,8 @@ void canvashdl::plot_triangle(vec3f v1, vector<float> v1_varying, vec3f v2, vect
 
 		vector<float> ave_varying(v1_varying.size());
 
-		if (shade_model == flat)
-			for (int i = 0; i < (int)v1_varying.size(); i++)
-				ave_varying[i] = (v1_varying[i] + v2_varying[i] + v3_varying[i])/3.0f;
+		for (int i = 0; i < (int)v1_varying.size(); i++)
+			ave_varying[i] = (v1_varying[i] + v2_varying[i] + v3_varying[i])/3.0f;
 
 		plot_half_triangle((vec3i)v1, v1_varying, (vec3i)v2, v2_varying, (vec3i)v3, v3_varying, ave_varying);
 		plot_half_triangle((vec3i)v3, v3_varying, (vec3i)v1, v1_varying, (vec3i)v2, v2_varying, ave_varying);
@@ -592,7 +610,9 @@ void canvashdl::draw_points(const vector<vec8f> &geometry)
 		plot_point(processed_geometry[i].first, processed_geometry[i].second);
 }
 
-/* Draw a set of 3D lines on the canvas. Each point in geometry
+/* draw_lines
+ *
+ * Draw a set of 3D lines on the canvas. Each point in geometry
  * is formatted (vx, vy, vz, nx, ny, nz, s, t). Don't forget to clip
  * the lines against the clipping planes of the projection. You can't
  * just not render them because you'll get some weird popping at the
@@ -686,7 +706,9 @@ void canvashdl::draw_lines(const vector<vec8f> &geometry, const vector<int> &ind
 				  processed_geometry[processed_indices[i]].first, processed_geometry[processed_indices[i]].second);
 }
 
-/* Draw a set of 3D triangles on the canvas. Each point in geometry is
+/* draw_triangles
+ *
+ * Draw a set of 3D triangles on the canvas. Each point in geometry is
  * formatted (vx, vy, vz, nx, ny, nz, s, t). Don't forget to clip the
  * triangles against the clipping planes of the projection. You can't
  * just not render them because you'll get some weird popping at the

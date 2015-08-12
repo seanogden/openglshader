@@ -1,3 +1,10 @@
+/*
+ * canvas.h
+ *
+ *  Created on: Dec 3, 2014
+ *      Author: nbingham
+ */
+
 #include "opengl.h"
 #include "standard.h"
 #include "core/geometry.h"
@@ -97,10 +104,8 @@ public:
 
 	enum
 	{
-		none = 0,
-		flat = 1,
-		gouraud = 2,
-		phong = 3
+		flat = 0,
+		smooth = 1
 	} shade_model;
 
 	enum
