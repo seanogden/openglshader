@@ -1,3 +1,10 @@
+/*
+ * object.cpp
+ *
+ *  Created on: Jan 2, 2015
+ *      Author: nbingham
+ */
+
 #include "object.h"
 
 rigidhdl::rigidhdl()
@@ -58,7 +65,7 @@ objecthdl::~objecthdl()
 void objecthdl::draw(const vector<lighthdl*> &lights)
 {
 	// TODO Assignment 1: Send transformations and geometry to the renderer to draw the object
-	// TODO Assignment 2: Pass the material as a uniform into the renderer
+	// TODO Assignment 3: Pass the material as a uniform into the renderer
 }
 
 /* draw_bound
@@ -71,7 +78,7 @@ void objecthdl::draw_bound()
 	/* TODO Assignment 1: Generate the geometry for the bounding box and send the necessary
 	 * transformations and geometry to the renderer
 	 */
-	// TODO Assignment 2: clear the material in the uniform list
+	// TODO Assignment 3: clear the material in the uniform list
 }
 
 /* draw_normals
@@ -86,5 +93,5 @@ void objecthdl::draw_normals(bool face)
 	 * transformations and geometry to the renderer
 	 */
 
-	// TODO Assignment 2: clear the material in the uniform list before rendering
+	// TODO Assignment 3: clear the material in the uniform list before rendering
 }

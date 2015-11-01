@@ -1,3 +1,10 @@
+/*
+ * material.h
+ *
+ *  Created on: Dec 18, 2014
+ *      Author: nbingham
+ */
+
 #include "core/geometry.h"
 #include "standard.h"
 #include "opengl.h"
@@ -71,10 +78,10 @@ struct phonghdl : materialhdl
 	materialhdl *clone() const;
 };
 
-struct brickhdl : materialhdl
+struct customhdl : materialhdl
 {
-	brickhdl();
-	~brickhdl();
+	customhdl();
+	~customhdl();
 
 	static GLuint vertex;
 	static GLuint fragment;

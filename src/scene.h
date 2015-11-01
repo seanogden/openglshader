@@ -1,3 +1,10 @@
+/*
+ * scene.h
+ *
+ *  Created on: Dec 3, 2014
+ *      Author: nbingham
+ */
+
 #include "opengl.h"
 
 #ifndef scene_h

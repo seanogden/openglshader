@@ -1,3 +1,10 @@
+/*
+ * material.cpp
+ *
+ *  Created on: Dec 18, 2014
+ *      Author: nbingham
+ */
+
 #include "material.h"
 #include "light.h"
 #include "lodepng.h"
@@ -10,9 +17,13 @@ GLuint gouraudhdl::vertex = 0;
 GLuint gouraudhdl::fragment = 0;
 GLuint gouraudhdl::program = 0;
 
-GLuint brickhdl::vertex = 0;
-GLuint brickhdl::fragment = 0;
-GLuint brickhdl::program = 0;
+GLuint phonghdl::vertex = 0;
+GLuint phonghdl::fragment = 0;
+GLuint phonghdl::program = 0;
+
+GLuint customhdl::vertex = 0;
+GLuint customhdl::fragment = 0;
+GLuint customhdl::program = 0;
 
 GLuint texturehdl::vertex = 0;
 GLuint texturehdl::fragment = 0;
@@ -30,6 +41,37 @@ materialhdl::~materialhdl()
 {
 }
 
+whitehdl::whitehdl()
+{
+	type = "white";
+
+	if (vertex == 0 && fragment == 0 && program == 0)
+	{
+		/* TODO Assignment 4: Load and link the shaders. Keep in mind that vertex, fragment, 
+		 * and program are static variables meaning they are *shared across all instances of
+		 * this class. So you only have to initialize them once when the first instance of
+		 * the class is created.
+		 */
+	}
+}
+
+whitehdl::~whitehdl()
+{
+
+}
+
+void whitehdl::apply(const vector<lighthdl*> &lights)
+{
+	glUseProgram(program);
+}
+
+materialhdl *whitehdl::clone() const
+{
+	whitehdl *result = new whitehdl();
+	result->type = type;
+	return result;
+}
+
 gouraudhdl::gouraudhdl()
 {
 	type = "gouraud";
@@ -41,7 +83,7 @@ gouraudhdl::gouraudhdl()
 
 	if (vertex == 0 && fragment == 0 && program == 0)
 	{
-		/* TODO Assignment 3: Load and link the shaders. Keep in mind that vertex, fragment, 
+		/* TODO Assignment 4: Load and link the shaders. Keep in mind that vertex, fragment, 
 		 * and program are static variables meaning they are *shared across all instances of
 		 * this class. So you only have to initialize them once when the first instance of
 		 * the class is created.
@@ -56,7 +98,7 @@ gouraudhdl::~gouraudhdl()
 
 void gouraudhdl::apply(const vector<lighthdl*> &lights)
 {
-	// TODO Assignment 3: Apply the shader program and pass it the necessary uniform values
+	// TODO Assignment 4: Apply the shader program and pass it the necessary uniform values
 }
 
 materialhdl *gouraudhdl::clone() const
@@ -82,7 +124,7 @@ phonghdl::phonghdl()
 
 	if (vertex == 0 && fragment == 0 && program == 0)
 	{
-		/* TODO Assignment 3: Load and link the shaders. Keep in mind that vertex, fragment, 
+		/* TODO Assignment 4: Load and link the shaders. Keep in mind that vertex, fragment, 
 		 * and program are static variables meaning they are *shared across all instances of
 		 * this class. So you only have to initialize them once when the first instance of
 		 * the class is created.
@@ -97,7 +139,7 @@ phonghdl::~phonghdl()
 
 void phonghdl::apply(const vector<lighthdl*> &lights)
 {
-	// TODO Assignment 3: Apply the shader program and pass it the necessary uniform values
+	// TODO Assignment 4: Apply the shader program and pass it the necessary uniform values
 }
 
 materialhdl *phonghdl::clone() const
@@ -112,13 +154,13 @@ materialhdl *phonghdl::clone() const
 	return result;
 }
 
-whitehdl::whitehdl()
+customhdl::customhdl()
 {
-	type = "white";
+	type = "custom";
 
 	if (vertex == 0 && fragment == 0 && program == 0)
 	{
-		/* TODO Assignment 3: Load and link the shaders. Keep in mind that vertex, fragment, 
+		/* TODO Assignment 4: Load and link the shaders. Keep in mind that vertex, fragment, 
 		 * and program are static variables meaning they are *shared across all instances of
 		 * this class. So you only have to initialize them once when the first instance of
 		 * the class is created.
@@ -126,50 +168,19 @@ whitehdl::whitehdl()
 	}
 }
 
-whitehdl::~whitehdl()
+customhdl::~customhdl()
 {
 
 }
 
-void whitehdl::apply(const vector<lighthdl*> &lights)
+void customhdl::apply(const vector<lighthdl*> &lights)
 {
-	glUseProgram(program);
+	// TODO Assignment 4: Apply the shader program and pass it the necessary uniform values
 }
 
-materialhdl *whitehdl::clone() const
+materialhdl *customhdl::clone() const
 {
-	whitehdl *result = new whitehdl();
-	result->type = type;
-	return result;
-}
-
-brickhdl::brickhdl()
-{
-	type = "brick";
-
-	if (vertex == 0 && fragment == 0 && program == 0)
-	{
-		/* TODO Assignment 3: Load and link the shaders. Keep in mind that vertex, fragment, 
-		 * and program are static variables meaning they are *shared across all instances of
-		 * this class. So you only have to initialize them once when the first instance of
-		 * the class is created.
-		 */
-	}
-}
-
-brickhdl::~brickhdl()
-{
-
-}
-
-void brickhdl::apply(const vector<lighthdl*> &lights)
-{
-	// TODO Assignment 3: Apply the shader program and pass it the necessary uniform values
-}
-
-materialhdl *brickhdl::clone() const
-{
-	brickhdl *result = new brickhdl();
+	customhdl *result = new customhdl();
 	result->type = type;
 	return result;
 }
@@ -182,7 +193,7 @@ texturehdl::texturehdl()
 
 	if (vertex == 0 && fragment == 0 && program == 0)
 	{
-		/* TODO Assignment 3: Load and link the shaders and load the texture Keep in mind that vertex, fragment,
+		/* TODO Assignment 4: Load and link the shaders and load the texture Keep in mind that vertex, fragment,
 		 * and program are static variables meaning they are *shared across all instances of
 		 * this class. So you only have to initialize them once when the first instance of
 		 * the class is created.
@@ -197,7 +208,7 @@ texturehdl::~texturehdl()
 
 void texturehdl::apply(const vector<lighthdl*> &lights)
 {
-	// TODO Assignment 3: Apply the shader program and pass it the necessary uniform values
+	// TODO Assignment 4: Apply the shader program and pass it the necessary uniform values
 }
 
 materialhdl *texturehdl::clone() const

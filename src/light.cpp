@@ -1,3 +1,10 @@
+/*
+ * light.cpp
+ *
+ *  Created on: Dec 17, 2014
+ *      Author: nbingham
+ */
+
 #include "light.h"
 #include "object.h"
 #include "opengl.h"
@@ -39,7 +46,7 @@ directionalhdl::~directionalhdl()
 
 void directionalhdl::update()
 {
-	/* TODO Assignment 2: Update the direction of the light using the orientation of the attached model.
+	/* TODO Assignment 3: Update the direction of the light using the orientation of the attached model.
 	 * The easiest thing is to do translations and rotations like you were going to render the object, and
 	 * then just multiply some initial direction vector by the normal matrix.
 	 */
@@ -47,7 +54,7 @@ void directionalhdl::update()
 
 void directionalhdl::apply(string name, GLuint program)
 {
-	/* TODO Assignment 3: Pass all necessary uniforms to the shaders for the directional light.
+	/* TODO Assignment 4: Pass all necessary uniforms to the shaders for the directional light.
 	 */
 }
 
@@ -70,7 +77,7 @@ pointhdl::~pointhdl()
 
 void pointhdl::update()
 {
-	/* TODO Assignment 2: Update the position of the light using the position of the attached model.
+	/* TODO Assignment 3: Update the position of the light using the position of the attached model.
 	 * The easiest thing is to do translations and rotations like you were going to render the object, and
 	 * then just multiply the origin by the modelview matrix.
 	 */
@@ -78,7 +85,7 @@ void pointhdl::update()
 
 void pointhdl::apply(string name, GLuint program)
 {
-	/* TODO Assignment 3: Pass all necessary uniforms to the shaders for point lights.
+	/* TODO Assignment 4: Pass all necessary uniforms to the shaders for point lights.
 	 */
 }
 
@@ -105,13 +112,13 @@ spothdl::~spothdl()
 
 void spothdl::update()
 {
-	/* TODO Assignment 2: Update both the direction and position of the light using the position and orientation
+	/* TODO Assignment 3: Update both the direction and position of the light using the position and orientation
 	 * of the attached model. See above.
 	 */
 }
 
 void spothdl::apply(string name, GLuint program)
 {
-	/* TODO Assignment 3: Pass all necessary uniforms to the shaders for spot lights.
+	/* TODO Assignment 4: Pass all necessary uniforms to the shaders for spot lights.
 	 */
 }
