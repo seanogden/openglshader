@@ -7,7 +7,7 @@
 
 #include "light.h"
 #include "object.h"
-#include "canvas.h"
+#include "opengl.h"
 
 lighthdl::lighthdl()
 {
@@ -44,7 +44,7 @@ directionalhdl::~directionalhdl()
 
 }
 
-void directionalhdl::update(canvashdl *canvas)
+void directionalhdl::update()
 {
 	if (canvas != NULL && model != NULL)
 	{
@@ -63,24 +63,10 @@ void directionalhdl::update(canvashdl *canvas)
 	}
 }
 
-void directionalhdl::shade(vec3f &ambient, vec3f &diffuse, vec3f &specular, vec3f vertex, vec3f normal, float shininess) const
+void directionalhdl::apply(string name, GLuint program)
 {
-	vec3f eye_direction = -vertex;
-	float eye_distance = mag(eye_direction);
-	eye_direction /= eye_distance;
-
-	vec3f half_vector = norm(direction + eye_direction);
-
-	float normal_dot_light_direction = max(0.0f, dot(normal, direction));
-	float normal_dot_half_vector = max(0.0f, dot(normal, half_vector));
-
-	float power_factor = 0.0;
-	if (normal_dot_light_direction > 0.0)
-		power_factor = pow(normal_dot_half_vector, shininess);
-
-	ambient += this->ambient;
-	diffuse += this->diffuse*normal_dot_light_direction;
-	specular += this->specular*power_factor;
+	/* TODO Assignment 4: Pass all necessary uniforms to the shaders for the directional light.
+	 */
 }
 
 pointhdl::pointhdl() : lighthdl(white*0.1f, white*0.5f, white)
@@ -100,7 +86,7 @@ pointhdl::~pointhdl()
 
 }
 
-void pointhdl::update(canvashdl *canvas)
+void pointhdl::update()
 {
 	if (canvas != NULL && model != NULL)
 	{
@@ -119,30 +105,10 @@ void pointhdl::update(canvashdl *canvas)
 	}
 }
 
-void pointhdl::shade(vec3f &ambient, vec3f &diffuse, vec3f &specular, vec3f vertex, vec3f normal, float shininess) const
+void pointhdl::apply(string name, GLuint program)
 {
-	vec3f light_direction = position - vertex;
-	float light_distance = mag(light_direction);
-	light_direction /= light_distance;
-
-	vec3f eye_direction = -vertex;
-	float eye_distance = mag(eye_direction);
-	eye_direction /= eye_distance;
-
-	float att = 1.0/(attenuation[0] + attenuation[1]*light_distance + attenuation[2]*light_distance*light_distance);
-
-	vec3f half_vector = norm(light_direction + eye_direction);
-
-	float normal_dot_light_direction = max(0.0f, dot(normal, light_direction));
-	float normal_dot_half_vector = max(0.0f, dot(normal, half_vector));
-
-	float power_factor = 0.0;
-	if (normal_dot_light_direction > 0.0)
-		power_factor = pow(normal_dot_half_vector, shininess);
-    
-	ambient += this->ambient*att;
-	diffuse += this->diffuse*normal_dot_light_direction*att;
-	specular += this->specular*power_factor*att;
+	/* TODO Assignment 4: Pass all necessary uniforms to the shaders for point lights.
+	 */
 }
 
 spothdl::spothdl() : lighthdl(white*0.1f, white*0.5f, white)
@@ -166,7 +132,7 @@ spothdl::~spothdl()
 
 }
 
-void spothdl::update(canvashdl *canvas)
+void spothdl::update()
 {
 	if (canvas != NULL && model != NULL)
 	{
@@ -187,34 +153,8 @@ void spothdl::update(canvashdl *canvas)
 	}
 }
 
-void spothdl::shade(vec3f &ambient, vec3f &diffuse, vec3f &specular, vec3f vertex, vec3f normal, float shininess) const
+void spothdl::apply(string name, GLuint program)
 {
-	vec3f light_direction = position - vertex;
-	float light_distance = mag(light_direction);
-	light_direction /= light_distance;
-
-	vec3f eye_direction = -vertex;
-	float eye_distance = mag(eye_direction);
-	eye_direction /= eye_distance;
-
-	float att = 1.0/(attenuation[0] + attenuation[1]*light_distance + attenuation[2]*light_distance*light_distance);
-	float spotdot = dot(-light_direction, direction);
-
-	float spotatt = 0.0;
-	if (spotdot >= cutoff)
-		spotatt = pow(spotdot, exponent);
-
-	att *= spotatt;
-
-	vec3f half_vector = norm(light_direction + norm(-vertex));
-	float normal_dot_light_direction = max(0.0f, dot(normal, light_direction));
-	float normal_dot_half_vector = max(0.0f, dot(normal, half_vector));
-
-	float power_factor = 0.0;
-	if (normal_dot_light_direction > 0.0)
-		power_factor = pow(normal_dot_half_vector, shininess);
-
-	ambient += this->ambient*att;
-	diffuse += this->diffuse*normal_dot_light_direction*att;
-	specular += this->specular*power_factor*att;
+	/* TODO Assignment 4: Pass all necessary uniforms to the shaders for spot lights.
+	 */
 }

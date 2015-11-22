@@ -15,7 +15,6 @@
 
 scenehdl::scenehdl()
 {
-	canvas = NULL;
 	active_camera = -1;
 	active_object = -1;
 	render_normals = none;
