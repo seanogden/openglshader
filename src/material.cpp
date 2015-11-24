@@ -87,6 +87,7 @@ gouraudhdl::gouraudhdl()
 
 	if (vertex == 0 && fragment == 0 && program == 0)
 	{
+        std::cout << "loading gouraud shader" << std::endl;
         //load shaders
         vertex = load_shader_file(working_directory + "res/gouraud.vx", GL_VERTEX_SHADER);
         fragment = load_shader_file(working_directory + "res/gouraud.ft", GL_FRAGMENT_SHADER);
@@ -106,6 +107,8 @@ gouraudhdl::~gouraudhdl()
 
 void gouraudhdl::apply(const vector<lighthdl*> &lights)
 {
+    std::cout << "applying gouraud shader" << std::endl;
+
 	int emission_location = glGetUniformLocation(program, "emission");
 	int ambient_location = glGetUniformLocation(program, "ambient");
 	int diffuse_location = glGetUniformLocation(program, "diffuse");
@@ -122,7 +125,7 @@ void gouraudhdl::apply(const vector<lighthdl*> &lights)
     int plights = 0;
 
     //Send light structs to shader uniforms
-    for (int i = 0; i < lights.size(); ++i)
+    for (unsigned int i = 0; i < lights.size(); ++i)
     {
         std::stringstream name;
 

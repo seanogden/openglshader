@@ -60,8 +60,8 @@ void init()
 
 	scene.cameras.push_back(new frustumhdl());
 	scene.objects.push_back(new pyramidhdl(1.0, 1.0, 8));
-	for (int k = 0; k < scene.objects.back()->rigid.size(); k++)
-		for (int i = 0; i < scene.objects.back()->rigid[k].geometry.size(); i++)
+	for (unsigned int k = 0; k < scene.objects.back()->rigid.size(); k++)
+		for (unsigned int i = 0; i < scene.objects.back()->rigid[k].geometry.size(); i++)
 		{
 			swap(scene.objects.back()->rigid[k].geometry[i][1], scene.objects.back()->rigid[k].geometry[i][2]);
 			scene.objects.back()->rigid[k].geometry[i][1] *= -1.0;
@@ -172,18 +172,18 @@ void pmotionfunc(int x, int y)
 
 		int old_active_object = scene.active_object;
 		scene.active_object = -1;
-		for (int i = 0; i < scene.objects.size(); i++)
+		for (unsigned int i = 0; i < scene.objects.size(); i++)
 		{
 			if (scene.objects[i] != NULL && scene.cameras[scene.active_camera]->model != scene.objects[i])
 			{
 				bool is_light = false;
 				bool is_camera = false;
 
-				for (int j = 0; j < scene.lights.size() && !is_light; j++)
+				for (unsigned int j = 0; j < scene.lights.size() && !is_light; j++)
 					if (scene.lights[j] != NULL && scene.lights[j]->model == scene.objects[i])
 						is_light = true;
 
-				for (int j = 0; j < scene.cameras.size() && !is_camera; j++)
+				for (unsigned int j = 0; j < scene.cameras.size() && !is_camera; j++)
 					if (scene.cameras[j] != NULL && scene.cameras[j]->model == scene.objects[i])
 						is_camera = true;
 
@@ -222,11 +222,11 @@ void pmotionfunc(int x, int y)
 			bool is_light = false;
 			bool is_camera = false;
 
-			for (int i = 0; i < scene.lights.size() && !is_light; i++)
+			for (unsigned int i = 0; i < scene.lights.size() && !is_light; i++)
 				if (scene.lights[i] != NULL && scene.active_object_valid() && scene.lights[i]->model == scene.objects[scene.active_object])
 					is_light = true;
 
-			for (int i = 0; i < scene.cameras.size() && !is_camera; i++)
+			for (unsigned int i = 0; i < scene.cameras.size() && !is_camera; i++)
 				if (scene.cameras[i] != NULL && scene.active_object_valid() && scene.cameras[i]->model == scene.objects[scene.active_object])
 					is_camera = true;
 
@@ -306,7 +306,7 @@ void motionfunc(int x, int y)
 			else if (manipulator == manipulate::scale)
 				scene.objects[scene.active_object]->scale += (float)deltay/100.0;
 
-			for (int i = 0; i < scene.cameras.size(); i++)
+			for (unsigned int i = 0; i < scene.cameras.size(); i++)
 				if (scene.cameras[i]->model == scene.objects[scene.active_object])
 				{
 					scene.cameras[i]->position = scene.objects[scene.active_object]->position;
@@ -486,8 +486,8 @@ void canvas_menu(int num)
 	{
 		scene.lights.push_back(new directionalhdl());
 		scene.objects.push_back(new cylinderhdl(0.25, 1.0, 8));
-		for (int k = 0; k < scene.objects.back()->rigid.size(); k++)
-			for (int i = 0; i < scene.objects.back()->rigid[k].geometry.size(); i++)
+		for (unsigned int k = 0; k < scene.objects.back()->rigid.size(); k++)
+			for (unsigned int i = 0; i < scene.objects.back()->rigid[k].geometry.size(); i++)
 			{
 				swap(scene.objects.back()->rigid[k].geometry[i][1], scene.objects.back()->rigid[k].geometry[i][2]);
 				scene.objects.back()->rigid[k].geometry[i][1] *= -1.0;
@@ -508,8 +508,8 @@ void canvas_menu(int num)
 	{
 		scene.lights.push_back(new spothdl());
 		scene.objects.push_back(new pyramidhdl(0.25, 1.0, 8));
-		for (int k = 0; k < scene.objects.back()->rigid.size(); k++)
-			for (int i = 0; i < scene.objects.back()->rigid[k].geometry.size(); i++)
+		for (unsigned int k = 0; k < scene.objects.back()->rigid.size(); k++)
+			for (unsigned int i = 0; i < scene.objects.back()->rigid[k].geometry.size(); i++)
 			{
 				swap(scene.objects.back()->rigid[k].geometry[i][1], scene.objects.back()->rigid[k].geometry[i][2]);
 				scene.objects.back()->rigid[k].geometry[i][1] *= -1.0;
@@ -540,8 +540,8 @@ void canvas_menu(int num)
 	{
 		scene.cameras.push_back(new orthohdl());
 		scene.objects.push_back(new pyramidhdl(1.0, 1.0, 8));
-		for (int k = 0; k < scene.objects.back()->rigid.size(); k++)
-			for (int i = 0; i < scene.objects.back()->rigid[k].geometry.size(); i++)
+		for (unsigned int k = 0; k < scene.objects.back()->rigid.size(); k++)
+			for (unsigned int i = 0; i < scene.objects.back()->rigid[k].geometry.size(); i++)
 			{
 				swap(scene.objects.back()->rigid[k].geometry[i][1], scene.objects.back()->rigid[k].geometry[i][2]);
 				scene.objects.back()->rigid[k].geometry[i][1] *= -1.0;
@@ -562,8 +562,8 @@ void canvas_menu(int num)
 	{
 		scene.cameras.push_back(new frustumhdl());
 		scene.objects.push_back(new pyramidhdl(1.0, 1.0, 8));
-		for (int k = 0; k < scene.objects.back()->rigid.size(); k++)
-			for (int i = 0; i < scene.objects.back()->rigid[k].geometry.size(); i++)
+		for (unsigned int k = 0; k < scene.objects.back()->rigid.size(); k++)
+			for (unsigned int i = 0; i < scene.objects.back()->rigid[k].geometry.size(); i++)
 			{
 				swap(scene.objects.back()->rigid[k].geometry[i][1], scene.objects.back()->rigid[k].geometry[i][2]);
 				scene.objects.back()->rigid[k].geometry[i][1] *= -1.0;
@@ -584,8 +584,8 @@ void canvas_menu(int num)
 	{
 		scene.cameras.push_back(new perspectivehdl());
 		scene.objects.push_back(new pyramidhdl(1.0, 1.0, 8));
-		for (int k = 0; k < scene.objects.back()->rigid.size(); k++)
-			for (int i = 0; i < scene.objects.back()->rigid[k].geometry.size(); i++)
+		for (unsigned int k = 0; k < scene.objects.back()->rigid.size(); k++)
+			for (unsigned int i = 0; i < scene.objects.back()->rigid[k].geometry.size(); i++)
 			{
 				swap(scene.objects.back()->rigid[k].geometry[i][1], scene.objects.back()->rigid[k].geometry[i][2]);
 				scene.objects.back()->rigid[k].geometry[i][1] *= -1.0;
@@ -634,11 +634,11 @@ void object_menu(int num)
 {
 	if (num == 0)
 	{
-		if (scene.active_object >= 0 && scene.active_object < scene.objects.size())
+		if (scene.active_object >= 0 && scene.active_object < (int)scene.objects.size())
 		{
 			if (scene.objects[scene.active_object] != NULL)
 			{
-				for (int i = 0; i < scene.lights.size(); )
+				for (unsigned int i = 0; i < scene.lights.size(); )
 				{
 					if (scene.lights[i] != NULL && scene.lights[i]->model == scene.objects[scene.active_object])
 					{
@@ -649,12 +649,12 @@ void object_menu(int num)
 						i++;
 				}
 
-				for (int i = 0; i < scene.cameras.size(); )
+				for (unsigned int i = 0; i < scene.cameras.size(); )
 				{
 					if (scene.cameras[i] != NULL && scene.cameras[i]->model == scene.objects[scene.active_object])
 					{
 						delete scene.cameras[i];
-						if (scene.active_camera > i)
+						if (scene.active_camera > (int)i)
 							scene.active_camera--;
 						scene.cameras.erase(scene.cameras.begin() + i);
 					}
@@ -670,7 +670,7 @@ void object_menu(int num)
 	else if (num == 4)
 	{
 		scene.active_camera = -1;
-		for (int i = 0; i < scene.cameras.size(); i++)
+		for (unsigned int i = 0; i < scene.cameras.size(); i++)
 			if (scene.cameras[i] != NULL && scene.active_object_valid() && scene.cameras[i]->model == scene.objects[scene.active_object])
 				scene.active_camera = i;
 
@@ -745,7 +745,7 @@ void object_menu(int num)
 
 void color_menu(int num)
 {
-	for (int i = 0; i < scene.lights.size(); i++)
+	for (unsigned int i = 0; i < scene.lights.size(); i++)
 		if (scene.lights[i] != NULL && scene.lights[i]->model == scene.objects[scene.active_object])
 		{
 			switch (num)
@@ -786,7 +786,7 @@ void color_menu(int num)
 
 void attenuation_menu(int num)
 {
-	for (int i = 0; i < scene.lights.size(); i++)
+	for (unsigned int i = 0; i < scene.lights.size(); i++)
 	{
 		if (scene.lights[i] != NULL && scene.lights[i]->model == scene.objects[scene.active_object] && scene.lights[i]->type == "point")
 		{

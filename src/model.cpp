@@ -42,10 +42,8 @@ modelhdl::~modelhdl()
  */
 void modelhdl::load_obj(string filename)
 {
-	int s = 4;
 	float x, y, z;
 	int v, n, t;
-	char name[32];
 
 	ifstream fin(filename.c_str());
 	if (!fin.is_open())
@@ -75,7 +73,7 @@ void modelhdl::load_obj(string filename)
 
 				if (mtlname.size() > 0 && mtlname[0] != '/')
 				{
-					int idx = filename.find_last_of("/");
+					unsigned int idx = filename.find_last_of("/");
 					if (idx == string::npos)
 						idx = filename.find_last_of("\\");
 					mtlname = filename.substr(0, idx) + "/" + mtlname;
@@ -169,9 +167,9 @@ void modelhdl::load_obj(string filename)
 	for (int i = 0; i < 6; i++)
 		bound[i] -= ave[i/2];
 
-	for (int k = 0; k < rigid.size(); k++)
-		for (int i = 0; i < rigid[k].geometry.size(); i++)
-			for (int j = 0; j < 3; j++)
+	for (unsigned int k = 0; k < rigid.size(); k++)
+		for (unsigned int i = 0; i < rigid[k].geometry.size(); i++)
+			for (unsigned int j = 0; j < 3; j++)
 				rigid[k].geometry[i][j] -= ave[j];
 
 	fin.close();

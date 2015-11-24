@@ -40,7 +40,6 @@ struct point
 
 void shade_point(point light, inout vec3 ambient, inout vec3 diffuse, inout vec3 specular, vec3 vertex, vec3 normal, float shininess)
 {
-
 	vec3 light_direction = light.position - vertex;
 	float light_distance = length(light_direction);
 	light_direction /= light_distance;

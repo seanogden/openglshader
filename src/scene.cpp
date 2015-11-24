@@ -24,15 +24,15 @@ scenehdl::scenehdl()
 
 scenehdl::~scenehdl()
 {
-	for (int i = 0; i < (int)objects.size(); i++)
+	for (unsigned int i = 0; i < objects.size(); i++)
 		delete objects[i];
 	objects.clear();
 
-	for (int i = 0; i < (int)cameras.size(); i++)
+	for (unsigned int i = 0; i < cameras.size(); i++)
 		delete cameras[i];
 	cameras.clear();
 
-	for (int i = 0; i < (int)lights.size(); i++)
+	for (unsigned int i = 0; i < lights.size(); i++)
 		delete lights[i];
 	lights.clear();
 }
@@ -49,19 +49,19 @@ void scenehdl::draw()
 	if (active_camera_valid())
 		cameras[active_camera]->view();
 
-	for (int i = 0; i < lights.size(); i++)
+	for (unsigned int i = 0; i < lights.size(); i++)
 		lights[i]->update();
 
-	for (int i = 0; i < objects.size(); i++)
+	for (unsigned int i = 0; i < objects.size(); i++)
 		if (objects[i] != NULL)
 		{
 			bool is_light = false;
 			bool is_camera = false;
-			for (int j = 0; j < lights.size() && !is_light; j++)
+			for (unsigned int j = 0; j < lights.size() && !is_light; j++)
 				if (lights[j] != NULL && lights[j]->model == objects[i])
 					is_light = true;
 
-			for (int j = 0; j < cameras.size() && !is_camera; j++)
+			for (unsigned int j = 0; j < cameras.size() && !is_camera; j++)
 				if (cameras[j] != NULL && cameras[j]->model == objects[i])
 					is_camera = true;
 
@@ -72,7 +72,7 @@ void scenehdl::draw()
 				if (render_normals == vertex || render_normals == face)
 					objects[i]->draw_normals(render_normals == face);
 
-				if (i == active_object)
+				if ((int)i == active_object)
 					objects[i]->draw_bound();
 			}
 		}
@@ -80,10 +80,10 @@ void scenehdl::draw()
 
 bool scenehdl::active_camera_valid()
 {
-	return (active_camera >= 0 && active_camera < cameras.size() && cameras[active_camera] != NULL);
+	return (active_camera >= 0 && active_camera < (int)cameras.size() && cameras[active_camera] != NULL);
 }
 
 bool scenehdl::active_object_valid()
 {
-	return (active_object >= 0 && active_object < objects.size() && objects[active_object] != NULL);
+	return (active_object >= 0 && active_object < (int)objects.size() && objects[active_object] != NULL);
 }

@@ -25,10 +25,10 @@ void rigidhdl::draw()
 {
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+//	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	glVertexPointer(3, GL_FLOAT, sizeof(float)*8, (float*)geometry.data());
 	glNormalPointer(GL_FLOAT, sizeof(float)*8, (float*)geometry.data()+3);
-	glTexCoordPointer(2, GL_FLOAT, sizeof(float)*8, (float*)geometry.data()+6);
+//	glTexCoordPointer(2, GL_FLOAT, sizeof(float)*8, (float*)geometry.data()+6);
 	glDrawElements(GL_TRIANGLES, (int)indices.size(), GL_UNSIGNED_INT, indices.data());
 }
 
@@ -76,7 +76,7 @@ void objecthdl::draw(const vector<lighthdl*> &lights)
     glRotatef(radtodeg(orientation[2]), 0.0, 0.0, 1.0);
     glScalef(scale, scale, scale);
 
-    for (int i = 0; i < rigid.size(); i++)
+    for (unsigned int i = 0; i < rigid.size(); i++)
     {
         material[rigid[i].material]->apply(lights);
         rigid[i].draw();
@@ -114,7 +114,7 @@ void objecthdl::draw_bound()
 	bound_geometry.push_back(vec8f(bound[1], bound[3], bound[5], 0.0, 0.0, 0.0, 0.0, 0.0));
 	bound_geometry.push_back(vec8f(bound[0], bound[3], bound[5], 0.0, 0.0, 0.0, 0.0, 0.0));
 	bound_indices.reserve(24);
-	for (int i = 0; i < 4; i++)
+	for (unsigned int i = 0; i < 4; i++)
 	{
 		bound_indices.push_back(i);
 		bound_indices.push_back((i+1)%4);

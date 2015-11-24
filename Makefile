@@ -1,4 +1,4 @@
-CXXFLAGS = -O0 -ggdb -fmessage-length=0
+CXXFLAGS = -O0 -ggdb -fmessage-length=0 -Wall
 SOURCES	:= $(shell find src -name '*.cpp') $(shell find src -name '*.c')
 OBJECTS	:= $(subst .c,.o,$(subst .cpp,.o,$(subst src/,build/,$(SOURCES))))
 DIRECTORIES := $(sort $(dir $(OBJECTS)))
