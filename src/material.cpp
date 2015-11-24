@@ -87,7 +87,6 @@ gouraudhdl::gouraudhdl()
 
 	if (vertex == 0 && fragment == 0 && program == 0)
 	{
-        std::cout << "loading gouraud shader" << std::endl;
         //load shaders
         vertex = load_shader_file(working_directory + "res/gouraud.vx", GL_VERTEX_SHADER);
         fragment = load_shader_file(working_directory + "res/gouraud.ft", GL_FRAGMENT_SHADER);
@@ -107,7 +106,7 @@ gouraudhdl::~gouraudhdl()
 
 void gouraudhdl::apply(const vector<lighthdl*> &lights)
 {
-    std::cout << "applying gouraud shader" << std::endl;
+	glUseProgram(program);
 
 	int emission_location = glGetUniformLocation(program, "emission");
 	int ambient_location = glGetUniformLocation(program, "ambient");
@@ -157,7 +156,6 @@ void gouraudhdl::apply(const vector<lighthdl*> &lights)
     loc = glGetUniformLocation(program, "num_plights");
     glUniform1i(loc, plights);
 
-	glUseProgram(program);
 }
 
 materialhdl *gouraudhdl::clone() const

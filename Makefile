@@ -5,6 +5,8 @@ DIRECTORIES := $(sort $(dir $(OBJECTS)))
 SEARCH_PATHS = 
 LDFLAGS	= 
 TARGET	= assignment
+DEP = $(subst .c,.d,$(subst .cpp,.d,$(subst src/,build/,$(SOURCES))))
+
 
 ifeq ($(OS),Windows_NT)
     CXXFLAGS += -static-libgcc -static-libstdc++ -D WIN32
@@ -38,10 +40,12 @@ $(TARGET): $(OBJECTS)
 	$(CXX) $(SEARCH_PATHS) $(CXXFLAGS) $(OBJECTS) $(LDFLAGS) -o $(TARGET)
 
 build/%.o: src/%.cpp
-	$(CXX) $(SEARCH_PATHS) $(CXXFLAGS) -c -o $@ $<
+	$(CXX) $(SEARCH_PATHS) $(CXXFLAGS) -c -MMD -MP -o $@ $<
 
 build/%.o: src/%.c
-	$(CC) $(SEARCH_PATHS) $(CXXFLAGS) -c -o $@ $<
+	$(CC) $(SEARCH_PATHS) $(CXXFLAGS) -c -MMD -MP -o $@ $<
+
+-include $(DEP)
 
 build:
 	mkdir $(DIRECTORIES)
