@@ -44,14 +44,13 @@ scenehdl::~scenehdl()
  */
 void scenehdl::draw()
 {
-	canvas->uniform.clear();
-	canvas->uniform["lights"] = &lights;
+    //TODO: Do i need to clear uniforms here?
 
 	if (active_camera_valid())
-		cameras[active_camera]->view(canvas);
+		cameras[active_camera]->view();
 
 	for (int i = 0; i < lights.size(); i++)
-		lights[i]->update(canvas);
+		lights[i]->update();
 
 	for (int i = 0; i < objects.size(); i++)
 		if (objects[i] != NULL)
@@ -68,13 +67,13 @@ void scenehdl::draw()
 
 			if ((!is_light && !is_camera) || (is_light && render_lights) || (is_camera && render_cameras && (!active_camera_valid() || objects[i] != cameras[active_camera]->model)))
 			{
-				objects[i]->draw(canvas);
+				objects[i]->draw(lights);
 
 				if (render_normals == vertex || render_normals == face)
-					objects[i]->draw_normals(canvas, render_normals == face);
+					objects[i]->draw_normals(render_normals == face);
 
 				if (i == active_object)
-					objects[i]->draw_bound(canvas);
+					objects[i]->draw_bound();
 			}
 		}
 }

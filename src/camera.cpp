@@ -23,22 +23,24 @@ camerahdl::~camerahdl()
 
 }
 
-void camerahdl::view(canvashdl *canvas)
+void camerahdl::view()
 {
-	canvas->load_identity();
+	glLoadIdentity();
+
 	if (focus == NULL)
 	{
-		canvas->rotate(-orientation[0], vec3f(1.0, 0.0, 0.0));
-		canvas->rotate(-orientation[1], vec3f(0.0, 1.0, 0.0));
-		canvas->rotate(-orientation[2], vec3f(0.0, 0.0, 1.0));
-		canvas->translate(-position);
+        glRotatef(radtodeg(-model->orientation[0]), 1.0, 0.0, 0.0);
+        glRotatef(radtodeg(-model->orientation[1]), 0.0, 1.0, 0.0);
+        glRotatef(radtodeg(-model->orientation[2]), 0.0, 0.0, 1.0);
+        glTranslatef(-position[0], -position[1], -position[2]);
 	}
 	else
 	{
 		position = focus->position + ror3(vec3f(0.0, 0.0, radius), orientation);
-		canvas->look_at(position,
-						focus->position,
-						ror3(vec3f(0.0, 1.0, 0.0), orientation));
+	    vec3f up = ror3(vec3f(0.0, 1.0, 0.0), orientation);
+        gluLookAt(position[0], position[1], position[2],
+                  focus->position[0], focus->position[1], focus->position[2],
+                  up[0], up[1], up[2]);
 	}
 
 	if (model != NULL)
@@ -64,12 +66,12 @@ orthohdl::~orthohdl()
 {
 }
 
-void orthohdl::project(canvashdl *canvas)
+void orthohdl::project()
 {
-	canvas->set_matrix(canvashdl::projection_matrix);
-	canvas->load_identity();
-	canvas->ortho(left, right, bottom, top, front, back);
-	canvas->set_matrix(canvashdl::modelview_matrix);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(left, right, bottom, top, front, back);
+    glMatrixMode(GL_MODELVIEW);
 }
 
 frustumhdl::frustumhdl()
@@ -88,12 +90,12 @@ frustumhdl::~frustumhdl()
 
 }
 
-void frustumhdl::project(canvashdl *canvas)
+void frustumhdl::project()
 {
-	canvas->set_matrix(canvashdl::projection_matrix);
-	canvas->load_identity();
-	canvas->frustum(left, right, bottom, top, front, back);
-	canvas->set_matrix(canvashdl::modelview_matrix);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glFrustum(left, right, bottom, top, front, back);
+    glMatrixMode(GL_MODELVIEW);
 }
 
 perspectivehdl::perspectivehdl()
@@ -110,10 +112,10 @@ perspectivehdl::~perspectivehdl()
 
 }
 
-void perspectivehdl::project(canvashdl *canvas)
+void perspectivehdl::project()
 {
-	canvas->set_matrix(canvashdl::projection_matrix);
-	canvas->load_identity();
-	canvas->perspective(fovy, aspect, front, back);
-	canvas->set_matrix(canvashdl::modelview_matrix);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(fovy, aspect, front, back);
+    glMatrixMode(GL_MODELVIEW);
 }

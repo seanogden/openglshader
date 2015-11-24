@@ -47,11 +47,15 @@ whitehdl::whitehdl()
 
 	if (vertex == 0 && fragment == 0 && program == 0)
 	{
-		/* TODO Assignment 4: Load and link the shaders. Keep in mind that vertex, fragment, 
-		 * and program are static variables meaning they are *shared across all instances of
-		 * this class. So you only have to initialize them once when the first instance of
-		 * the class is created.
-		 */
+        //load shaders
+        vertex = load_shader_file(working_directory + "res/white.vx", GL_VERTEX_SHADER);
+        fragment = load_shader_file(working_directory + "res/white.ft", GL_FRAGMENT_SHADER);
+
+        //link shaders
+        program = glCreateProgram();
+        glAttachShader(program, vertex);
+        glAttachShader(program, fragment);
+        glLinkProgram(program);
 	}
 }
 
@@ -83,34 +87,15 @@ gouraudhdl::gouraudhdl()
 
 	if (vertex == 0 && fragment == 0 && program == 0)
 	{
-		/* TODO Assignment 4: Load and link the shaders. Keep in mind that vertex, fragment, 
-		 * and program are static variables meaning they are *shared across all instances of
-		 * this class. So you only have to initialize them once when the first instance of
-		 * the class is created.
-		 */
-	}
-}
+        //load shaders
+        vertex = load_shader_file(working_directory + "res/gouraud.vx", GL_VERTEX_SHADER);
+        fragment = load_shader_file(working_directory + "res/gouraud.ft", GL_FRAGMENT_SHADER);
 
-gouraudhdl::~gouraudhdl()
-{
-
-	eye_space_vertex = canvas->matrices[canvashdl::projection_matrix]*eye_space_vertex;
-	eye_space_vertex /= eye_space_vertex[3];
-	return eye_space_vertex;
-}
-
-vec3f gouraudhdl::shade_fragment(canvashdl *canvas, vector<float> &varying) const
-{
-	return vec3f(varying[0], varying[1], varying[2]);
-=======
-
-	if (vertex == 0 && fragment == 0 && program == 0)
-	{
-		/* TODO Assignment 4: Load and link the shaders. Keep in mind that vertex, fragment, 
-		 * and program are static variables meaning they are *shared across all instances of
-		 * this class. So you only have to initialize them once when the first instance of
-		 * the class is created.
-		 */
+        //link shaders
+        program = glCreateProgram();
+        glAttachShader(program, vertex);
+        glAttachShader(program, fragment);
+        glLinkProgram(program);
 	}
 }
 
@@ -121,7 +106,55 @@ gouraudhdl::~gouraudhdl()
 
 void gouraudhdl::apply(const vector<lighthdl*> &lights)
 {
-	// TODO Assignment 4: Apply the shader program and pass it the necessary uniform values
+	int emission_location = glGetUniformLocation(program, "emission");
+	int ambient_location = glGetUniformLocation(program, "ambient");
+	int diffuse_location = glGetUniformLocation(program, "diffuse");
+	int specular_location = glGetUniformLocation(program, "specular");
+	int shininess_location = glGetUniformLocation(program, "shininess");
+	glUniform3f(emission_location, emission[0], emission[1], emission[2]);
+	glUniform3f(ambient_location, ambient[0], ambient[1], ambient[2]);
+	glUniform3f(diffuse_location, diffuse[0], diffuse[1], diffuse[2]);
+	glUniform3f(specular_location, specular[0], specular[1], specular[2]);
+	glUniform1f(shininess_location, shininess);
+
+    int dlights = 0;
+    int slights = 0;
+    int plights = 0;
+
+    //Send light structs to shader uniforms
+    for (int i = 0; i < lights.size(); ++i)
+    {
+        std::stringstream name;
+
+        if (lights[i]->type.compare("directional") == 0)
+        {
+            name << "dlights[" << dlights << "].";
+            dlights++;
+        }
+        else if (lights[i]->type.compare("spot") == 0)
+        {
+            name << "slights[" << slights << "].";
+            slights++;
+        }
+        else
+        {
+            name << "plights[" << plights << "].";
+            plights++;
+        }
+
+        lights[i]->apply(name.str(), program);
+    }
+
+    
+    //Send counts of lights to shader uniforms.
+    GLuint loc = glGetUniformLocation(program, "num_dlights");
+    glUniform1i(loc, dlights);
+    loc = glGetUniformLocation(program, "num_slights");
+    glUniform1i(loc, slights);
+    loc = glGetUniformLocation(program, "num_plights");
+    glUniform1i(loc, plights);
+
+	glUseProgram(program);
 }
 
 materialhdl *gouraudhdl::clone() const
@@ -203,8 +236,6 @@ materialhdl *customhdl::clone() const
 texturehdl::texturehdl()
 {
 	type = "texture";
-
-	float m = mag2(eye_coord_normal);
 
 	if (vertex == 0 && fragment == 0 && program == 0)
 	{
