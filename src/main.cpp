@@ -981,6 +981,11 @@ int main(int argc, char **argv)
 	glutInitWindowSize(width, height);
 	glutInitWindowPosition(0, 0);
 	window_id = glutCreateWindow("Assignment");
+#ifdef LINUX
+    stringstream ss;
+    ss << "WINDOWID=" << window_id;
+    putenv((char*)ss.str().c_str());
+#endif
 
 #ifdef __GLEW_H__
 	GLenum err = glewInit();

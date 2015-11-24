@@ -15,7 +15,7 @@ void main()
 	vec3 eye_space_vertex;
 	vec3 eye_space_normal;
 	eye_space_vertex = vertex.xyz;
-	eye_space_normal = gl_NormalMatrix*gl_Normal;
+	eye_space_normal = normalize(gl_NormalMatrix*gl_Normal);
 	
 	color = vec4(lighting(emission, ambient, diffuse, specular, shininess, eye_space_vertex, eye_space_normal), 1.0);
 

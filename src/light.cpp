@@ -55,13 +55,8 @@ void directionalhdl::update()
         glRotatef(radtodeg(model->orientation[1]), 0.0, 1.0, 0.0);
         glRotatef(radtodeg(model->orientation[2]), 0.0, 0.0, 1.0);
 
-        GLfloat m[16]; 
-        glGetFloatv (GL_MODELVIEW_MATRIX, m);
-        mat4f mv = mat4f(   m[0], m[1], m[2], m[3],
-                            m[4], m[5], m[6], m[7],
-                            m[8], m[9], m[10], m[11],
-                            m[12], m[13], m[14], m[15]);
-
+        mat4f mv;
+        glGetFloatv(GL_TRANSPOSE_MODELVIEW_MATRIX, (float*)mv.data);
 		direction = transpose(inverse(mv))*vec4f(0.0, 0.0, -1.0, 0.0);
 
         glRotatef(radtodeg(-model->orientation[2]), 0.0, 0.0, 1.0);
@@ -174,22 +169,42 @@ void spothdl::update()
         glRotatef(radtodeg(model->orientation[1]), 0.0, 1.0, 0.0);
         glRotatef(radtodeg(model->orientation[2]), 0.0, 0.0, 1.0);
 
-        /* TODO: update position
-		vec4f p = canvas->matrices[canvashdl::modelview_matrix]*vec4f(0.0, 0.0, 0.0, 1.0);
+        mat4f mv;
+        glGetFloatv(GL_TRANSPOSE_MODELVIEW_MATRIX, (float*)mv.data);
+		vec4f p = mv*vec4f(0.0, 0.0, 0.0, 1.0);
 		position = p(0,3)/p[3];
-		canvas->update_normal_matrix();
-		direction = canvas->matrices[canvashdl::normal_matrix]*vec4f(0.0, 0.0, -1.0, 0.0);
-        */
+		direction = transpose(inverse(mv))*vec4f(0.0, 0.0, -1.0, 0.0);
 
-        glRotatef(radtodeg(model->orientation[2]), 0.0, 0.0, 1.0);
-        glRotatef(radtodeg(model->orientation[1]), 0.0, 1.0, 0.0);
-        glRotatef(radtodeg(model->orientation[0]), 1.0, 0.0, 0.0);
+        glRotatef(radtodeg(-model->orientation[2]), 0.0, 0.0, 1.0);
+        glRotatef(radtodeg(-model->orientation[1]), 0.0, 1.0, 0.0);
+        glRotatef(radtodeg(-model->orientation[0]), 1.0, 0.0, 0.0);
         glTranslatef(-model->position[0], -model->position[1], -model->position[2]);
 	}
 }
 
 void spothdl::apply(string name, GLuint program)
 {
-	/* TODO Assignment 4: Pass all necessary uniforms to the shaders for spot lights.
-	 */
+    GLuint loc = glGetUniformLocation(program, (name + "ambient").c_str());
+    glUniform3f(loc, ambient[0], ambient[1], ambient[2]);
+
+    loc = glGetUniformLocation(program, (name + "diffuse").c_str());
+    glUniform3f(loc, diffuse[0], diffuse[1], diffuse[2]);
+
+    loc = glGetUniformLocation(program, (name + "specular").c_str());
+    glUniform3f(loc, specular[0], specular[1], specular[2]);
+
+    loc = glGetUniformLocation(program, (name + "attenuation").c_str());
+    glUniform3f(loc, attenuation[0], attenuation[1], attenuation[2]);
+
+    loc = glGetUniformLocation(program, (name + "position").c_str());
+    glUniform3f(loc, position[0], position[1], position[2]);
+
+    loc = glGetUniformLocation(program, (name + "cutoff").c_str());
+    glUniform1f(loc, cutoff);
+
+    loc = glGetUniformLocation(program, (name + "exponent").c_str());
+    glUniform1f(loc, exponent);
+
+    loc = glGetUniformLocation(program, (name + "direction").c_str());
+    glUniform3f(loc, direction[0], direction[1], direction[2]);
 }
