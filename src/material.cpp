@@ -306,14 +306,13 @@ texturehdl::texturehdl()
 
 	if (vertex == 0 && fragment == 0 && program == 0)
 	{
+        glEnable(GL_TEXTURE_2D);
         std::cout << "loading texture" << std::endl;
         unsigned int width;
         unsigned int height;
-        std::vector<unsigned char> png;
-        std::vector<unsigned char> image;
+        unsigned char* image;
 
-        lodepng::load_file(png, working_directory + "res/texture.png");
-        unsigned int error = lodepng::decode(image, width, height, png);
+        unsigned int error = lodepng_decode32_file(&image, &width, &height, (working_directory + "res/texture.png").c_str());
 
         if(error) 
         {
@@ -325,8 +324,13 @@ texturehdl::texturehdl()
         glGenTextures(1, &texture);
         glBindTexture(GL_TEXTURE_2D, texture);
 
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
         // Set texture data
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, (unsigned char*)image.data());
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
         glBindTexture(GL_TEXTURE_2D, 0);
 
         std::cout << "loading texture shaders" << std::endl;
