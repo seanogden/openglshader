@@ -331,7 +331,7 @@ texturehdl::texturehdl()
 
         // Set texture data
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
-        glBindTexture(GL_TEXTURE_2D, 0);
+        //glBindTexture(GL_TEXTURE_2D, 0);
 
         std::cout << "loading texture shaders" << std::endl;
         //load shaders
@@ -358,7 +358,7 @@ void texturehdl::apply(const vector<lighthdl*> &lights)
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
     int tex_location = glGetUniformLocation(program, "tex");
-    glUniform1i(tex_location, GL_TEXTURE0);
+    glUniform1i(tex_location, 0);
     int shininess_location = glGetUniformLocation(program, "shininess");
 	glUniform1f(shininess_location, shininess);
 
