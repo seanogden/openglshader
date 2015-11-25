@@ -23,13 +23,17 @@ rigidhdl::~rigidhdl()
  */
 void rigidhdl::draw()
 {
+    // Set working texture
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
-//	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	glVertexPointer(3, GL_FLOAT, sizeof(float)*8, (float*)geometry.data());
 	glNormalPointer(GL_FLOAT, sizeof(float)*8, (float*)geometry.data()+3);
-//	glTexCoordPointer(2, GL_FLOAT, sizeof(float)*8, (float*)geometry.data()+6);
+	glTexCoordPointer(2, GL_FLOAT, sizeof(float)*8, (float*)geometry.data()+6);
 	glDrawElements(GL_TRIANGLES, (int)indices.size(), GL_UNSIGNED_INT, indices.data());
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_NORMAL_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 }
 
 objecthdl::objecthdl()
@@ -124,6 +128,8 @@ void objecthdl::draw_bound()
 		bound_indices.push_back(4+i);
 	}
 
+    whitehdl w;
+    w.apply(std::vector<lighthdl*>());
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer(3, GL_FLOAT, sizeof(float)*8, (float*)bound_geometry.data());
 	glDrawElements(GL_LINES, (int)bound_indices.size(), GL_UNSIGNED_INT, bound_indices.data());
@@ -143,7 +149,6 @@ void objecthdl::draw_bound()
  */
 void objecthdl::draw_normals(bool face)
 {
-/* TODO: Draw normals
 	float radius = 0.0;
 	for (int i = 0; i < 6; i++)
 		if (abs(bound[i]) > radius)
@@ -152,16 +157,17 @@ void objecthdl::draw_normals(bool face)
 	vector<vec8f> normal_geometry;
 	vector<int> normal_indices;
 
-	canvas->translate(position);
-	canvas->rotate(orientation[0], vec3f(1.0, 0.0, 0.0));
-	canvas->rotate(orientation[1], vec3f(0.0, 1.0, 0.0));
-	canvas->rotate(orientation[2], vec3f(0.0, 0.0, 1.0));
-	canvas->scale(vec3f(scale, scale, scale));
-	for (int i = 0; i < rigid.size(); i++)
+    glTranslatef(position[0], position[1], position[2]);
+    glRotatef(radtodeg(orientation[0]), 1.0, 0.0, 0.0);
+    glRotatef(radtodeg(orientation[1]), 0.0, 1.0, 0.0);
+    glRotatef(radtodeg(orientation[2]), 0.0, 0.0, 1.0);
+    glScalef(scale, scale, scale); 
+
+	for (unsigned int i = 0; i < rigid.size(); i++)
 	{
 		if (!face)
 		{
-			for (int j = 0; j < rigid[i].geometry.size(); j++)
+			for (unsigned int j = 0; j < rigid[i].geometry.size(); j++)
 			{
 				normal_indices.push_back(normal_geometry.size());
 				normal_geometry.push_back(rigid[i].geometry[j]);
@@ -174,7 +180,7 @@ void objecthdl::draw_normals(bool face)
 		}
 		else
 		{
-			for (int j = 0; j < rigid[i].indices.size(); j+=3)
+			for (unsigned int j = 0; j < rigid[i].indices.size(); j+=3)
 			{
 				vec3f normal = norm((vec3f)rigid[i].geometry[rigid[i].indices[j + 0]](3,6) +
 									(vec3f)rigid[i].geometry[rigid[i].indices[j + 1]](3,6) +
@@ -191,15 +197,19 @@ void objecthdl::draw_normals(bool face)
 			}
 		}
 
-		canvas->uniform["material"] = NULL;
-		canvas->draw_lines(normal_geometry, normal_indices);
+        whitehdl w;
+        w.apply(std::vector<lighthdl*>());
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glVertexPointer(3, GL_FLOAT, sizeof(float)*8, (float*)normal_geometry.data());
+        glDrawElements(GL_LINES, (int)normal_indices.size(), GL_UNSIGNED_INT, normal_indices.data());
+
 		normal_geometry.clear();
 		normal_indices.clear();
 	}
-	canvas->scale(vec3f(1.0/scale, 1.0/scale, 1.0/scale));
-	canvas->rotate(-orientation[2], vec3f(0.0, 0.0, 1.0));
-	canvas->rotate(-orientation[1], vec3f(0.0, 1.0, 0.0));
-	canvas->rotate(-orientation[0], vec3f(1.0, 0.0, 0.0));
-	canvas->translate(-position);
-*/
+
+    glScalef(1.0/scale, 1.0/scale, 1.0/scale);
+    glRotatef(radtodeg(-orientation[2]), 0.0, 0.0, 1.0);
+    glRotatef(radtodeg(-orientation[1]), 0.0, 1.0, 0.0);
+    glRotatef(radtodeg(-orientation[0]), 1.0, 0.0, 0.0);
+    glTranslatef(-position[0], -position[1], -position[2]);
 }

@@ -181,6 +181,7 @@ phonghdl::phonghdl()
 
 	if (vertex == 0 && fragment == 0 && program == 0)
 	{
+        std::cout << "loading phong" << std::endl;
         //load shaders
         vertex = load_shader_file(working_directory + "res/phong.vx", GL_VERTEX_SHADER);
         fragment = load_shader_file(working_directory + "res/phong.ft", GL_FRAGMENT_SHADER);
@@ -286,7 +287,6 @@ customhdl::~customhdl()
 
 void customhdl::apply(const vector<lighthdl*> &lights)
 {
-	// TODO Assignment 4: Apply the shader program and pass it the necessary uniform values
 }
 
 materialhdl *customhdl::clone() const
@@ -300,24 +300,101 @@ texturehdl::texturehdl()
 {
 	type = "texture";
 
+	shininess = 1.0;
+    
+
+
 	if (vertex == 0 && fragment == 0 && program == 0)
 	{
-		/* TODO Assignment 4: Load and link the shaders and load the texture Keep in mind that vertex, fragment,
-		 * and program are static variables meaning they are *shared across all instances of
-		 * this class. So you only have to initialize them once when the first instance of
-		 * the class is created.
-		 */
+        std::cout << "loading texture" << std::endl;
+        unsigned int width;
+        unsigned int height;
+        std::vector<unsigned char> png;
+        std::vector<unsigned char> image;
+
+        lodepng::load_file(png, working_directory + "res/texture.png");
+        unsigned int error = lodepng::decode(image, width, height, png);
+
+        if(error) 
+        {
+            std::cout << "decoder error " << error << ": " << lodepng_error_text(error) << std::endl;
+            return;
+        }
+
+        //set give the working texture an ID 
+        glGenTextures(1, &texture);
+        glBindTexture(GL_TEXTURE_2D, texture);
+
+        // Set texture data
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, (unsigned char*)image.data());
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+        std::cout << "loading texture shaders" << std::endl;
+        //load shaders
+        vertex = load_shader_file(working_directory + "res/texture.vx", GL_VERTEX_SHADER);
+        fragment = load_shader_file(working_directory + "res/texture.ft", GL_FRAGMENT_SHADER);
+
+        //link shaders
+        program = glCreateProgram();
+        glAttachShader(program, vertex);
+        glAttachShader(program, fragment);
+        glLinkProgram(program);
 	}
+
 }
 
 texturehdl::~texturehdl()
 {
-
 }
 
 void texturehdl::apply(const vector<lighthdl*> &lights)
 {
-	// TODO Assignment 4: Apply the shader program and pass it the necessary uniform values
+	glUseProgram(program);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    int tex_location = glGetUniformLocation(program, "tex");
+    glUniform1i(tex_location, GL_TEXTURE0);
+    int shininess_location = glGetUniformLocation(program, "shininess");
+	glUniform1f(shininess_location, shininess);
+
+    int dlights = 0;
+    int slights = 0;
+    int plights = 0;
+
+    //Send light structs to shader uniforms
+    for (unsigned int i = 0; i < lights.size(); ++i)
+    {
+        std::stringstream name;
+
+        if (lights[i]->type.compare("directional") == 0)
+        {
+            name << "dlights[" << dlights << "].";
+            dlights++;
+        }
+        else if (lights[i]->type.compare("spot") == 0)
+        {
+            name << "slights[" << slights << "].";
+            slights++;
+        }
+        else
+        {
+            name << "plights[" << plights << "].";
+            plights++;
+        }
+
+        lights[i]->apply(name.str(), program);
+    }
+
+    
+    //Send counts of lights to shader uniforms.
+    GLuint loc = glGetUniformLocation(program, "num_dlights");
+    glUniform1i(loc, dlights);
+    loc = glGetUniformLocation(program, "num_slights");
+    glUniform1i(loc, slights);
+    loc = glGetUniformLocation(program, "num_plights");
+    glUniform1i(loc, plights);
+
 }
 
 materialhdl *texturehdl::clone() const
